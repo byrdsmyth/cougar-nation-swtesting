@@ -3,8 +3,8 @@ package com.wsu;
 
 import java.util.logging.Logger;
 
-public class HellowWorld {
-	public HellowWorld() {
+public class MainClass {
+	public MainClass() {
 	
 	}
 	
