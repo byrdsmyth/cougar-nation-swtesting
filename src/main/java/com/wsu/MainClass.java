@@ -3,14 +3,19 @@ package com.wsu;
 
 import java.util.logging.Logger;
 
+/**Class to provide the entry into the java application*/
 public class MainClass {
-	public MainClass() {
 	
+	/**The class logger*/
+	private static final Logger logger = Logger.getLogger("MainClass");
+	
+	/**Constructor*/
+	public MainClass() {	
 	}
 	
+	/**Method for starting the java application*/
 	public static void main(String[] args) {
-        System.out.println("Hello World!");
-        System.out.println("I did update");
+		logger.info("Entering Main Class");
     }
 
 }
