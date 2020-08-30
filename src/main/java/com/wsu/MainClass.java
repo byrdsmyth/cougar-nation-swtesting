@@ -1,6 +1,5 @@
 package com.wsu;
 
-
 import java.util.logging.Logger;
 
 /**Class to provide the entry into the java application*/
