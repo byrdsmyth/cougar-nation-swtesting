@@ -16,5 +16,13 @@ public class MainClass {
 	public static void main(String[] args) {
 		logger.info("Entering Main Class");
     }
+	
+	public boolean beTrue() {
+		return true;
+	}
+	
+	public String isMainClass() {
+		return "MainClass";
+	}
 
 }
