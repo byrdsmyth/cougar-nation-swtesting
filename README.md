@@ -1,7 +1,6 @@
 Team Names
 Lodermeier, Ryan
 
-
 Steps....
 First Time:
 1)git config -global user.name "username"
