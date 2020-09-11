@@ -1,3 +1,5 @@
+Testing access for Britt
+
 Steps....
 First Time:
 1)git config -global user.name "username"
