@@ -4,7 +4,7 @@ Lodermeier, Ryan
 
 Davis, Britt
 
-Njuguna, Jesse
+Njuguna, Jesse W
 
 Steps....
 First Time:
