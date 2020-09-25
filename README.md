@@ -1,6 +1,6 @@
 Team Names
 
-Lodermeier, Ryan
+Without Ryan
 
 Davis, Britt
 
