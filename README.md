@@ -2,7 +2,7 @@ Team Names
 
 Lodermeier, Ryan
 
-Davis, Britt
+Davis, Brittany
 
 Njuguna, Jesse W
 
