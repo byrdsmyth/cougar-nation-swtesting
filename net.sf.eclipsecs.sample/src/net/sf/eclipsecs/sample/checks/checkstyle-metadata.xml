@@ -14,5 +14,54 @@
             </property-metadata>
             <quickfix classname="net.sf.eclipsecs.sample.checks.MethodLimitQuickfix" />
         </rule-metadata>
+        
+        <rule-metadata name="%Blob.name" internal-name="Blob" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.BlobCheck" />
+            <description>%Blob.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%DuplicateCode.name" internal-name="DuplicateCode" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.DuplicateCodeCheck" />
+            <description>%DuplicateCode.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%FeatureEnvy.name" internal-name="FeatureEnvy" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.FeatureEnvyCheck" />
+            <description>%FeatureEnvy.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%RefusedBequest.name" internal-name="RefusedBequest" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.RefusedBequestCheck" />
+            <description>%RefusedBequest.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%SwissArmyKnife.name" internal-name="SwissArmyKnife" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SwissArmyKnifeCheck" />
+            <description>%SwissArmyKnife.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%TypeChecking.name" internal-name="TypeChecking" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.TypeCheckingCheck" />
+            <description>%TypeChecking.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="100">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
     </rule-group-metadata>
 </checkstyle-metadata>
