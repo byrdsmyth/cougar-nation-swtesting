@@ -12,7 +12,7 @@ First Time:
 2)git config -global user.email "email"
 
 After inital setup, get the repo going and walk through basic work flow
-(If you want to use the SSH push/pull, which is older and less secure)
+
 1) git init (eother in directory of planned repo or give it the path)
 2a) If first time with Git Hub create your keys in Linux then add to Git Hub. 
 2) git clone with ssh key
