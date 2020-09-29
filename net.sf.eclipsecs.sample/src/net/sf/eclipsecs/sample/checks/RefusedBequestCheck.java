@@ -1,5 +1,5 @@
-package net.sf.eclipsecs.sample.checks;
-
-public class RefusedBequestCheck {
-
-}
+//package net.sf.eclipsecs.sample.checks;
+//
+//public class RefusedBequestCheck {
+//
+//}

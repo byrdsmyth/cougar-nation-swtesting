@@ -1,20 +1,32 @@
-//package net.sf.eclipsecs.sample.checks;
+package net.sf.eclipsecs.sample.checks;
 //
 //import com.puppycrawl.tools.checkstyle.api.DetailAST;
-//import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-//import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
-//import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
-//import com.puppycrawl.tools.checkstyle.api.TextBlock;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
 //import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
-//
+
 //public class SwissArmyKnifeCheck extends AbstractCheck {
+
+// long method, large class, no inheritance, long parameter list
+// number of interfaces too high - how to measure?
+// combine semantics with software complexity
+
+
+/**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+//    public static final String MSG_KEY = "army.knife";
+
 //    
 //    /**
 //     * Counts of descendant tokens. Indexed by (token ID - 1) for performance.
 //     */
 //    private int[] counts = CommonUtil.EMPTY_INT_ARRAY;
 //    
-//    /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
+    /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
 //    @Override
 //    public int[] getDefaultTokens() {
 //        return getRequiredTokens();

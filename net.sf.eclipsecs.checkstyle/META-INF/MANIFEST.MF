@@ -49,3 +49,4 @@ Export-Package: .,
  org.apache.commons.beanutils;version="8.5.1"
 Bundle-ClassPath: .,
  checkstyle-8.5-all.jar
+Automatic-Module-Name: net.sf.eclipsecs.checkstyle

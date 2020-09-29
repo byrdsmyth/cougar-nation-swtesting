@@ -1,5 +1,5 @@
-package net.sf.eclipsecs.sample.checks;
-
-public class SpaghettiCodeCheck {
-
-}
+//package net.sf.eclipsecs.sample.checks;
+//
+//public class SpaghettiCodeCheck {
+//
+//}
