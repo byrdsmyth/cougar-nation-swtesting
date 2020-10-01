@@ -1,8 +1,11 @@
 package net.sf.eclipsecs.sample.checks;
-
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+//
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
+//import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class SwissArmyKnifeCheck extends AbstractCheck {
 
@@ -10,32 +13,24 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
 // number of interfaces too high - how to measure?
 // combine semantics with software complexity
 
-    private int max = 0;
+    private int interfaceCount = 0;
     
 /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
      */
-    public static final String MSG_KEY = "army.knife";
+//    public static final String MSG_KEY = "army.knife";
 
-    /**
-     * An array of tokens for interface modifiers.
-     */
-    private static final int[] TOKENS_FOR_INTERFACE_MODIFIERS = {
-        TokenTypes.LITERAL_STATIC,
-        TokenTypes.ABSTRACT,
-    };
     
     /**
      * Counts of descendant tokens. Indexed by (token ID - 1) for performance.
      */
 //    private int[] counts = CommonUtil.EMPTY_INT_ARRAY;
-//    
+    
     /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
     @Override
     public int[] getDefaultTokens() {
-        
-        return getRequiredTokens();
+        return new int[] { TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF };
     }
 
     /* returns a set, which contains all the TokenTypes that can be processed by the check. 
@@ -51,63 +46,20 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
      * all the TokenTypes from RequiredTokens. */
     @Override
     public int[] getRequiredTokens() {
-        return new int[] { TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF };
+        return new int[0];
     }
-    
+
     @Override
     public void visitToken(DetailAST ast) {
-        if (ast.getType() == TokenTypes.INTERFACE_DEF) {
-            max++;
-            System.out.println("Found interface");
-        }
+//        if (ast.getType() == TokenTypes.INTERFACE_DEF) {
+        interfaceCount++;
+        System.out.println("Now have found " + interfaceCount + " Interfaces");
+        if (interfaceCount > 1) {
+//            log(ast.getLineNo(), MSG_KEY, max);
+            System.out.println("Yes interface");
+          }
         else {
             System.out.println("No interface");
         }
-            
-            
-//        final DetailAST typeAST = ast.getParent();
-//        if (typeAST.getType() == TokenTypes.TYPE) {
-//            String type_temp = typeAST.getText();
-//            System.out.println(type_temp);
-//            final DetailAST variableAST = typeAST.getNextSibling();
-//            if (variableAST != null) {
-//                type_temp = typeAST.getText();
-//                System.out.println(type_temp);
-//            }
-//           
-//            DetailAST interfaceOne = ast.findFirstToken(TokenTypes.INTERFACE_DEF);
-//            if(interfaceOne != null) {
-//                int numInterfaces = interfaceOne.getChildCount(TokenTypes.INTERFACE_DEF);
-//                System.out.println("Found " + numInterfaces + "Interfaces");
-//            }
-//            
-//            if (ast.getType() == TokenTypes.INTERFACE_DEF) {
-//                final DetailAST modifiers =
-//                        ast.findFirstToken(TokenTypes.MODIFIERS);
-//
-//                    for (final int tokenType : TOKENS_FOR_INTERFACE_MODIFIERS) {
-//                        final DetailAST modifier =
-//                                modifiers.findFirstToken(tokenType);
-//                        if (modifier != null) {
-//                            log(modifier, MSG_KEY, modifier.getText());
-//                        }
-//                    }
-//
-//            }
-
-//                final boolean isMethod = typeAST.getParent().getType() == TokenTypes.METHOD_DEF;
-//                final boolean isJavaStyle = variableAST.getLineNo() > ast.getLineNo()
-//                    || variableAST.getColumnNo() - ast.getColumnNo() > -1;
-//
-//                // force all methods to be Java style (see note in top Javadoc)
-//                final boolean isMethodViolation = isMethod && !isJavaStyle;
-//                final boolean isVariableViolation = !isMethod && isJavaStyle != javaStyle;
-//
-//                if (isMethodViolation || isVariableViolation) {
-//                    log(ast, MSG_KEY);
-//                }
-//            }
-//        }
-        }
-//
+    }
 }
