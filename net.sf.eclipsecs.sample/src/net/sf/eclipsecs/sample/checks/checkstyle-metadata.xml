@@ -51,7 +51,7 @@
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SwissArmyKnifeCheck" />
             <description>%SwissArmyKnife.desc</description>
             <property-metadata name="max" datatype="Integer" default-value="100">
-                <description>The maximum number of allowed methods.</description>
+                <description>The maximum number of allowed methods.</description>  
             </property-metadata>
         </rule-metadata>
         

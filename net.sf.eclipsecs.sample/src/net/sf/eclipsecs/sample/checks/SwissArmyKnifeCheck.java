@@ -13,13 +13,14 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
 // number of interfaces too high - how to measure?
 // combine semantics with software complexity
 
-    private int interfaceCount = 0;
+    private int max = 1;
     
 /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
      */
-//    public static final String MSG_KEY = "army.knife";
+    public static final String MSG_KEY = "army.knife";
+    public int interfaceCount = 0;
 
     
     /**
@@ -51,13 +52,13 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-//        if (ast.getType() == TokenTypes.INTERFACE_DEF) {
-        interfaceCount++;
-        System.out.println("Now have found " + interfaceCount + " Interfaces");
-        if (interfaceCount > 1) {
-//            log(ast.getLineNo(), MSG_KEY, max);
-            System.out.println("Yes interface");
-          }
+        if (ast.getType() == TokenTypes.INTERFACE_DEF) {
+            interfaceCount++;
+            System.out.println("Now have found " + interfaceCount + " Interfaces");
+            if (interfaceCount > max) {
+                log(ast.getLineNo(), MSG_KEY, max);
+              }
+        }
         else {
             System.out.println("No interface");
         }
