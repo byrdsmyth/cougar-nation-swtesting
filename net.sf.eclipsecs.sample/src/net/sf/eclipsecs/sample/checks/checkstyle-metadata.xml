@@ -50,10 +50,10 @@
         <rule-metadata name="%SwissArmyKnife.name" internal-name="SwissArmyKnife" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SwissArmyKnifeCheck" />
             <description>%SwissArmyKnife.desc</description>
-            <property-metadata name="max" datatype="Integer" default-value="100">
-                <description>The maximum number of allowed methods.</description>  
+            <property-metadata name="maxInterfaces" datatype="Integer" default-value="5">
+                <description>The maximum number of allowed interfaces.</description>  
             </property-metadata>
-        </rule-metadata>
+            <property-metadata name="maxMethods" datatype="Integer" default-value="5"><description>The maximum number of allowed methods.</description></property-metadata></rule-metadata>
         
         <rule-metadata name="%TypeChecking.name" internal-name="TypeChecking" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.TypeCheckingCheck" />
