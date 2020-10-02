@@ -15,7 +15,7 @@ import com.puppycrawl.tools.checkstyle.api.TextBlock;
 // polymorphism
 // all properties must be present to characterise a class as Spaghetti Code
 // RULE:LongMethod RULE:NoParameter RULE:NoInheritance RULE:NoPolymorphism RULE:ProceduralName RULE:UseGlobalVariable { STRUCT USE GLOBAL VARIABLE };
-// Attribution: based some code off of getMethodLengthCHeck on checkstyle's github page
+// Attribution: based some code off of getMethodLengthCHeck on checkstyle's github page: https://github.com/checkstyle/checkstyle/blob/master/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheck.java
 public class SpaghettiCodeCheck extends AbstractCheck {
     
     /**
@@ -24,14 +24,19 @@ public class SpaghettiCodeCheck extends AbstractCheck {
      */
     public static final String MSG_KEY = "spaghetti";
 
-    /** Default maximum number of lines. */
-    private static final int DEFAULT_MAX_LINES = 150;
-
     /** Control whether to count empty lines and single line comments of the form {@code //}. */
     private boolean countEmpty = true;
 
     /** Specify the maximum number of lines allowed. */
+    private int DEFAULT_MAX_LINES = 150;
+    private int DEFAULT_MAX_GLOBALS = 5;
+    private int DEFAULT_MAX_METHODS = 15;
     private int max = DEFAULT_MAX_LINES;
+    private boolean METHOD_TOO_LONG = false;
+    private boolean CLASS_TOO_LONG = false;
+    private boolean TOO_MANY_GLOBALS = false;
+    private boolean NO_PARAMETERS = false;
+    private boolean NO_INHERITANCE = false;
 
     @Override
     public int[] getDefaultTokens() {
@@ -51,6 +56,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     
     @Override
     public void visitToken(DetailAST ast) {
+        // to find global variables: search for public, static, variable
+        int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
         final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
         if (openingBrace != null) {
             final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);

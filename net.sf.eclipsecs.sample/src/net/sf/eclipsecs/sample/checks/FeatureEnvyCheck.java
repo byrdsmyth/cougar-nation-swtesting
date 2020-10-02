@@ -1,4 +1,6 @@
-//package net.sf.eclipsecs.sample.checks;
+
+// A method making too many calls to methods of [5][8][48][57] another class to obtain data and/or functionality.
+// package net.sf.eclipsecs.sample.checks;
 //
 //import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 //import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
