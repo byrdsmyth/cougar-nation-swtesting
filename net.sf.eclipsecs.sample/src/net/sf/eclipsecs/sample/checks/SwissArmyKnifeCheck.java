@@ -8,7 +8,7 @@ import com.puppycrawl.tools.checkstyle.api.TextBlock;
 //import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class SwissArmyKnifeCheck extends AbstractCheck {
-    
+     
     private int maxInterfaces = 1;
     private int maxMethods = 10;
     private int interfaceCount = 0;
@@ -20,6 +20,10 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
 
      // definition from PDF: Generally, this anti-pattern arises when a class has many methods with high
      // complexity and the class has a high number of interfaces
+    // This can easily be observed by not just having a large number of methods, but
+    // in particularly implementing too many interfaces and/or using multiple inheritance.
+    // so: implements, extends, and count of method? source: https://arxiv.org/pdf/1703.10882.pdf
+    
 /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.

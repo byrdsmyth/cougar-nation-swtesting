@@ -32,11 +32,10 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     private int DEFAULT_MAX_GLOBALS = 5;
     private int DEFAULT_MAX_METHODS = 15;
     private int max = DEFAULT_MAX_LINES;
+    private int currentGlobalsCount = 0;
     private boolean METHOD_TOO_LONG = false;
     private boolean CLASS_TOO_LONG = false;
-    private boolean TOO_MANY_GLOBALS = false;
-    private boolean NO_PARAMETERS = false;
-    private boolean NO_INHERITANCE = false;
+    private boolean INHERITANCE = false;
 
     @Override
     public int[] getDefaultTokens() {
@@ -56,14 +55,52 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     
     @Override
     public void visitToken(DetailAST ast) {
-        // to find global variables: search for public, static, variable
-        int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
-        final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
-        if (openingBrace != null) {
-            final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
-            final int length = getLengthOfBlock(openingBrace, closingBrace);
-            if (length > max) {
-                log(ast, MSG_KEY, length, max);
+        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
+            //look for long methods with no parameters
+            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
+            if (numberOfParameters == 0) {
+                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
+                if (openingBrace != null) {
+                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
+                    final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    if (length > max) {
+                        this.METHOD_TOO_LONG = true;
+                        log(ast, "Long parameter with no methods stinks of Spaghetti code");
+                    }
+                }
+            }
+        }
+        // to find global variables: search for public variable at top-level of class
+        if (ast.getType() == TokenTypes.OBJBLOCK) {
+            // look for Var defs that are immediate children
+            DetailAST blockChild = ast.getFirstChild();
+            while (blockChild != null) {
+                if(blockChild.getType() != TokenTypes.VARIABLE_DEF) {
+                    blockChild = blockChild.getNextSibling();
+                }
+                else {
+                    DetailAST childType = blockChild.findFirstToken(TokenTypes.TYPE);
+                    if (childType.getText() == "public") {
+                        this.currentGlobalsCount++;
+                    }
+                }
+            }
+        }
+        // to check inheritance look for Implements and Extends
+        if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
+            this.INHERITANCE = true;
+        }
+        // Look for long classes using the get length function
+        if (ast.getType() == TokenTypes.CLASS_DEF) {
+            DetailAST block = ast.findFirstToken(TokenTypes.OBJBLOCK);
+            final DetailAST openingBrace = block.findFirstToken(TokenTypes.LCURLY);
+            if (openingBrace != null) {
+                final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
+                final int length = getLengthOfBlock(openingBrace, closingBrace);
+                if (length > max) {
+                    this.CLASS_TOO_LONG = true;
+                    log(ast, "Long parameter with no methods stinks of Spaghetti code");
+                }
             }
         }
     }
@@ -74,6 +111,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
      * @param openingBrace block opening brace
      * @param closingBrace block closing brace
      * @return number of lines with code for current block
+     * Code for calculating length from getMethodLengthCHeck on checkstyle's github page
      */
     private int getLengthOfBlock(DetailAST openingBrace, DetailAST closingBrace) {
         int length = closingBrace.getLineNo() - openingBrace.getLineNo() + 1;
