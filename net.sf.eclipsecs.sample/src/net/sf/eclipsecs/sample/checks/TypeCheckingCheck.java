@@ -4,15 +4,22 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-/**Class to detect casting and heavy logical statements*/
 public class TypeCheckingCheck extends AbstractCheck{
 
     
-      private int max = 1;
+      private static int MAX_INSTANCEOF = 1;
+      private static int MAX_SWITCHES = 10;
+      private static int MAX_ORS = 20;
+      private static int MAX_ANDS = 20;
+      private int instances = 0;
+      private int switches = 0;
+      private int ors = 0;
+      private int ands = 0;
       
       @Override
       public int[] getAcceptableTokens() {
-        return new int[] { TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF };
+        return new int[] { TokenTypes.LITERAL_INSTANCEOF, TokenTypes.LITERAL_SWITCH, 
+                TokenTypes.LOR, TokenTypes.LAND, };
       }
 
       @Override
@@ -22,20 +29,28 @@ public class TypeCheckingCheck extends AbstractCheck{
 
       @Override
       public int[] getDefaultTokens() {
-        return new int[] { TokenTypes.EXPR};
+        return new int[] {TokenTypes.LITERAL_INSTANCEOF, TokenTypes.LITERAL_SWITCH};
       }
       
-      public void setMax(int limit) {
-            max = limit;
-      }
       
       @Override
       public void visitToken(DetailAST ast) {
-        //Find INSTANCEOF under neither
-        DetailAST objBlock = ast.findFirstToken(TokenTypes.EXPR);
-        int instances = objBlock.getChildCount(TokenTypes.LITERAL_INSTANCEOF);
-        if(instances > max) {
-            log(ast.getLineNo(), "instanceof", max);
-        }
+          if (ast.getType() == TokenTypes.LITERAL_INSTANCEOF) {
+              instances++;
+          }
+          if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
+              switches++;
+          }
+          if(ast.getType() == TokenTypes.LOR) {
+              ors++;
+          }
+          if(ast.getType() == TokenTypes.LAND) {
+              ands++;
+          }
+          
+          if(instances >= MAX_INSTANCEOF || switches >= MAX_SWITCHES ||
+                  ors >= MAX_ORS || ands >= MAX_ANDS) {
+              log(ast.getLineNo(), "Type Check violation detected");
+          }
       }
 }
