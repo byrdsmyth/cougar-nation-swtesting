@@ -23,7 +23,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 	  public int[] getDefaultTokens() {
 	    return new int[] {TokenTypes.LITERAL_INSTANCEOF};
 	  }
-	  
+	   
 	  public void setMax(int limit) {
 		    max = limit;
 	  }

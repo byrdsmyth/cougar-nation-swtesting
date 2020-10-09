@@ -9,8 +9,9 @@ import com.puppycrawl.tools.checkstyle.api.TextBlock;
 
 public class SwissArmyKnifeCheck extends AbstractCheck {
      
-    private int maxInterfaces = 1;
-    private int maxMethods = 10;
+    private int maxMethods = 5;
+    private int maxInterfaces = 5;
+    
     private int interfaceCount = 0;
     private int methodCount = 0;
     
@@ -31,6 +32,23 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
     public static final String MSG_KEY = "army.knife";
     
 
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param ignoreComments True if comments should be ignored.
+     */
+    public void setMaxMethods(int maxMethods) {
+        this.maxMethods = maxMethods;
+    }
+
+    
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param ignoreComments True if comments should be ignored.
+     */
+    public void setMaxInterfaces(int maxInterfaces) {
+        this.maxInterfaces = maxInterfaces;
+    }
+
     
     /**
      * Counts of descendant tokens. Indexed by (token ID - 1) for performance.
@@ -40,7 +58,7 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
     /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
     @Override
     public int[] getDefaultTokens() {
-        return new int[] { TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF };
+        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.INTERFACE_DEF };
     }
 
     /* returns a set, which contains all the TokenTypes that can be processed by the check. 
@@ -61,19 +79,27 @@ public class SwissArmyKnifeCheck extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
+        System.out.println("Max Interfaces " + maxInterfaces );
+        System.out.println("Max Methods " + maxMethods );
         if (ast.getType() == TokenTypes.INTERFACE_DEF) {
             interfaceCount++;
             System.out.println("Now have found " + interfaceCount + " Interfaces");
+            checkViolations(ast);
         }
         else {
             if (ast.getType() == TokenTypes.METHOD_DEF) {
                 methodCount++;
                 System.out.println("Now have found " + methodCount + " Methods");
+                checkViolations(ast);
             }
             System.out.println("No interface");
         }
+    }
+    
+    public void checkViolations(DetailAST ast) {
         if (interfaceCount > maxInterfaces && methodCount > maxMethods) {
-            log(ast.getLineNo(), MSG_KEY, maxInterfaces);
+            System.out.println("Logging");
+            log(ast.getLineNo(), MSG_KEY, "XX");
           }
     }
 }
