@@ -28,19 +28,52 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     private boolean countEmpty = true;
 
     /** Specify the maximum number of lines allowed. */
-    private int DEFAULT_MAX_LINES = 150;
-    private int DEFAULT_MAX_GLOBALS = 5;
-    private int DEFAULT_MAX_METHODS = 15;
-    private int max = DEFAULT_MAX_LINES;
+    private int maxGlobalVars = 5;
+    private int maxClassLength = 1500;
+    private int maxMethodLength = 150;
     private int currentGlobalsCount = 0;
-    private boolean METHOD_TOO_LONG = false;
-    private boolean CLASS_TOO_LONG = false;
+    
+    /** Vars for local use only **/
+    private boolean TOO_MANY_GLOBALS = false;
     private boolean INHERITANCE = false;
+    
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param countEmpty True if comments should be ignored.
+     */
+    public void setCountEmpty(boolean countEmpty) {
+        this.countEmpty = countEmpty;
+    }
+    
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param maxGlobalVars True if comments should be ignored.
+     */
+    public void setMaxGlobals(int maxGlobalVars) {
+        this.maxGlobalVars = maxGlobalVars;
+    }
+    
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param maxClassLength True if comments should be ignored.
+     */
+    public void setmaxClassLength(int maxClassLength) {
+        this.maxClassLength = maxClassLength;
+    }
+    
+    /**
+     * Sets if matches within comments should be ignored.
+     * @param maxMethodLength True if comments should be ignored.
+     */
+    public void setMaxLines(int maxMethodLength) {
+        this.maxMethodLength = maxMethodLength;
+    }
 
     @Override
     public int[] getDefaultTokens() {
         // begin with ones for checking length of method
-        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF };
+        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.OBJBLOCK, 
+                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF };
     }
 
     @Override
@@ -55,21 +88,11 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     
     @Override
     public void visitToken(DetailAST ast) {
-        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
-            //look for long methods with no parameters
-            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
-            if (numberOfParameters == 0) {
-                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
-                if (openingBrace != null) {
-                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
-                    final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    if (length > max) {
-                        this.METHOD_TOO_LONG = true;
-                        log(ast, "Long parameter with no methods stinks of Spaghetti code");
-                    }
-                }
-            }
+        // to check inheritance look for Implements and Extends
+        if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
+            this.INHERITANCE = true;
         }
+        
         // to find global variables: search for public variable at top-level of class
         if (ast.getType() == TokenTypes.OBJBLOCK) {
             // look for Var defs that are immediate children
@@ -82,13 +105,29 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                     DetailAST childType = blockChild.findFirstToken(TokenTypes.TYPE);
                     if (childType.getText() == "public") {
                         this.currentGlobalsCount++;
+                        if (this.currentGlobalsCount > this.maxGlobalVars && this.INHERITANCE == false) {
+                            this.TOO_MANY_GLOBALS = true;
+                        }
                     }
                 }
             }
         }
-        // to check inheritance look for Implements and Extends
-        if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
-            this.INHERITANCE = true;
+        
+        // look for methods that break the rules
+        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
+            //look for long methods with no parameters
+            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
+            if (numberOfParameters == 0 && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
+                if (openingBrace != null) {
+                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
+                    // make sure they are not too long
+                    final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    if (length > maxMethodLength) {
+                        log(ast.getLineNo(), MSG_KEY, "XX");
+                    }
+                }
+            }
         }
         // Look for long classes using the get length function
         if (ast.getType() == TokenTypes.CLASS_DEF) {
@@ -97,9 +136,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
             if (openingBrace != null) {
                 final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
                 final int length = getLengthOfBlock(openingBrace, closingBrace);
-                if (length > max) {
-                    this.CLASS_TOO_LONG = true;
-                    log(ast, "Long parameter with no methods stinks of Spaghetti code");
+                if (length > maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                    log(ast.getLineNo(), MSG_KEY, "XX");
                 }
             }
         }

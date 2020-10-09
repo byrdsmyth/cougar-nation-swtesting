@@ -53,13 +53,33 @@
             <property-metadata name="maxInterfaces" datatype="Integer" default-value="5">
                 <description>The maximum number of allowed interfaces.</description>  
             </property-metadata>
-            <property-metadata name="maxMethods" datatype="Integer" default-value="5"><description>The maximum number of allowed methods.</description></property-metadata></rule-metadata>
+            <property-metadata name="maxMethods" datatype="Integer" default-value="5">
+                <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
         
         <rule-metadata name="%TypeChecking.name" internal-name="TypeChecking" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.TypeCheckingCheck" />
             <description>%TypeChecking.desc</description>
             <property-metadata name="max" datatype="Integer" default-value="100">
                 <description>The maximum number of allowed methods.</description>
+            </property-metadata>
+        </rule-metadata>
+        
+        <rule-metadata name="%SpaghettiCode.name" internal-name="SpaghettiCode" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SpaghettiCodeCheck" />
+            <description>%SpaghettiCode.desc</description>
+            <property-metadata name="countEmpty" datatype="Boolean" default-value="true">
+                <description>Control whether to count empty lines and single line comments.</description>
+            </property-metadata>
+            <property-metadata name="maxGlobalVars" datatype="Integer" default-value="5">
+                <description>The maximum number of global variables.</description>
+            </property-metadata>
+            <property-metadata name="maxMethodLength" datatype="Integer" default-value="150">
+                <description>The maximum allowed number of lines in a single method.</description>  
+            </property-metadata>
+            <property-metadata name="maxClassLength" datatype="Integer" default-value="1500">
+                <description>The maximum number of lines in a single class.</description>
             </property-metadata>
         </rule-metadata>
         
@@ -107,15 +127,6 @@
                 <description>The maximum number of allowed methods.</description>
             </property-metadata>
         </rule-metadata>
-        -->
-      
-        <!--<rule-metadata name="%SpaghettiCode.name" internal-name="SpaghettiCode" parent="TreeWalker">
-            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SpaghettiCodeCheck" />
-            <description>%SpaghettiCode.desc</description>
-            <property-metadata name="max" datatype="Integer" default-value="100">
-                <description>The maximum number of allowed methods.</description>
-           </property-metadata>
-           </rule-metadata>
         -->
         
     </rule-group-metadata>
