@@ -15,10 +15,11 @@ public class BlobCheck extends AbstractCheck {
 
 	private int max = 10;
 	private int variableCount = 0;
+	private int methodCount = 0;
 
 	@Override
 	public int[] getAcceptableTokens() {
-		return new int[] { TokenTypes.VARIABLE_DEF };
+		return new int[] { TokenTypes.VARIABLE_DEF, TokenTypes.METHOD_DEF };
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class BlobCheck extends AbstractCheck {
 
 	@Override
 	public int[] getDefaultTokens() {
-		return new int[] {TokenTypes.VARIABLE_DEF };
+		return new int[] { TokenTypes.VARIABLE_DEF, TokenTypes.METHOD_DEF };
 	}
 
 	public void setMax(int limit) {
@@ -37,18 +38,29 @@ public class BlobCheck extends AbstractCheck {
 
 	@Override
 	public void visitToken(DetailAST ast) {
-	if(ast.getType() == TokenTypes.VARIABLE_DEF){
-		variableCount++;
-	 }
+		switch (ast.getType()) {
+		case TokenTypes.VARIABLE_DEF:
+			variableCount++;
+			break;
+		case TokenTypes.METHOD_DEF:
+			methodCount++;
+			break;
+		}
+
 	}
+
 	public void finishTree(DetailAST tree) {
 		log(tree.getLineNo(), "blobVar", variableCount);
-		
 		if (variableCount > max) {
 			log(tree.getLineNo(), "blobVarMax", max);
 		}
-	
 		variableCount = 0;
+
+		log(tree.getLineNo(), "methodCount", methodCount);
+		if (methodCount > max) {
+			log(tree.getLineNo(), "methodlimit", max);
+		}
+		methodCount = 0;
 	}
 
 }

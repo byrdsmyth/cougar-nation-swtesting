@@ -19,7 +19,7 @@
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.BlobCheck" />
             <description>%Blob.desc</description>
             <property-metadata name="max" datatype="Integer" default-value="10">
-                <description>The maximum number of allowed variables.</description>
+                <description>The maximum number of allowed variables/methods.</description>
             </property-metadata>
         </rule-metadata>
         
