@@ -44,7 +44,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     
     private int maxGlobalVars = 5;
     private int maxClassLength = 1000;
-    private int maxMethodLength = 150;
+    private int maxMethodLength = 100;
     
     /**
      * Sets max number of methods.
@@ -125,6 +125,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                     final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
                     // make sure they are not too long
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    System.out.println("Method length: " + length);
                     if (length > maxMethodLength) {
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
                     }
@@ -143,6 +144,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                 if (openingBrace != null) {
                     final DetailAST closingBrace = block.findFirstToken(TokenTypes.RCURLY);
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    System.out.println("Class length: " + length);
                     if (length > maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
                     }

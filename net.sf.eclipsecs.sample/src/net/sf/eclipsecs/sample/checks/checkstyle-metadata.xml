@@ -34,9 +34,6 @@
         <rule-metadata name="%FeatureEnvy.name" internal-name="FeatureEnvy" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.FeatureEnvyCheck" />
             <description>%FeatureEnvy.desc</description>
-            <property-metadata name="max" datatype="Integer" default-value="100">
-                <description>The maximum number of allowed methods.</description>
-            </property-metadata>
         </rule-metadata>
         
         <rule-metadata name="%RefusedBequest.name" internal-name="RefusedBequest" parent="TreeWalker">
