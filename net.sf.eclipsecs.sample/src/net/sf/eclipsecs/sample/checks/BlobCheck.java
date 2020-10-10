@@ -14,7 +14,9 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class BlobCheck extends AbstractCheck {
 
 	private int max = 10;
+	// variable to keep count of the number of variables declared
 	private int variableCount = 0;
+	// variable to keep count of the number of methods defined
 	private int methodCount = 0;
 
 	@Override
@@ -32,10 +34,17 @@ public class BlobCheck extends AbstractCheck {
 		return new int[] { TokenTypes.VARIABLE_DEF, TokenTypes.METHOD_DEF };
 	}
 
+	/*
+	 * Sets the max value for both the variables and methods
+	 */
 	public void setMax(int limit) {
 		max = limit;
 	}
 
+	/*
+	 * Counter Method; increments count for every desired token that is visited by
+	 * one. Allows for re-factoring if needed to include other token types
+	 */
 	@Override
 	public void visitToken(DetailAST ast) {
 		switch (ast.getType()) {
@@ -46,10 +55,13 @@ public class BlobCheck extends AbstractCheck {
 			methodCount++;
 			break;
 		}
-
 	}
 
-	public void finishTree(DetailAST tree) {
+	/*
+	 * logs the number of violations or non-violations on the test code reset the
+	 * counters until next call
+	 */
+	public void printTree(DetailAST tree) {
 		log(tree.getLineNo(), "blobVar", variableCount);
 		if (variableCount > max) {
 			log(tree.getLineNo(), "blobVarMax", max);
