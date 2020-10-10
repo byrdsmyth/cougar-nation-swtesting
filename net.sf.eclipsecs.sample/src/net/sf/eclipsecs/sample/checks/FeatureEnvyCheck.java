@@ -1,24 +1,31 @@
 package net.sf.eclipsecs.sample.checks;
+
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-// A method making too many calls to methods of [5][8][48][57] another class to obtain data and/or functionality.
-// package net.sf.eclipsecs.sample.checks;
-//
 import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-//import com.puppycrawl.tools.checkstyle.api.CommonUtil;
-//import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
-// Feature envy is when a method uses data and methods from another class
-// more than it uses data and methods from its own class
+/**
+ * <p>
+ * Checks for potential locations of Feature Envy code smells.
+ * </p>
+ * <p>
+ * This check looks for a class which references any other class
+ * more often than itself
+ * </p>
+ * <p>
+ * Parent is {@code com.puppycrawl.tools.checkstyle.TreeWalker}
+ * </p>
+ */
 
 public class FeatureEnvyCheck extends AbstractCheck {
     
+    /**
+    /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
     @Override
     public int[] getDefaultTokens() {
         // begin with ones for checking length of method
@@ -33,11 +40,18 @@ public class FeatureEnvyCheck extends AbstractCheck {
         return getRequiredTokens();
     }
 
+    /* returns a set of TokenTypes which Check must be subscribed to for a valid execution. 
+     * If the user wants to specify a custom set of TokenTypes then this set must contain 
+     * all the TokenTypes from RequiredTokens. */
     @Override
     public int[] getRequiredTokens() {
         return new int[0];
     }
 
+    /**
+     * Checks each token
+     * @param ast
+     */
     @Override
     public void visitToken(DetailAST ast) {
         System.out.println("Hi!");
@@ -46,6 +60,10 @@ public class FeatureEnvyCheck extends AbstractCheck {
         checkSiblings(ast.getFirstChild(), count);
     }
 
+    /**
+     * For each top level token, examines siblings
+     * @param child, count
+     */
     public void checkSiblings(DetailAST child, int count) {
         // Initializing a Dictionary
         Dictionary<String, Integer> classFeatures = new Hashtable<>();
@@ -92,6 +110,10 @@ public class FeatureEnvyCheck extends AbstractCheck {
         }
     }
     
+    /**
+     * When SLIST token found, explore subtree here
+     * @param child
+     */
     public String checkSLIST(DetailAST child) {
             if (child.getType() == TokenTypes.EXPR) {
                 child = child.getFirstChild();
@@ -110,97 +132,3 @@ public class FeatureEnvyCheck extends AbstractCheck {
             return "none";
     }
 }
-//            if (s.branchContains(TokenTypes.VARIABLE_DEF)) {
-//                System.out.println("Found SLIST");
-//                
-//                if (ast.branchContains(TokenTypes.VARIABLE_DEF)) {
-//                        System.out.println("Variables found!" + ast.getText());
-//                        // is it from another class?
-//                        if (ast.branchContains(TokenTypes.ASSIGN)) {
-//                                System.out.println("Assign found!" + ast.getText());
-//                                if (ast.branchContains(TokenTypes.EXPR)) {
-//                                    if (ast.branchContains(TokenTypes.LITERAL_NEW)) {
-//                                        System.out.println("Possible creating of new class instance");
-//                                        String className = ast.findFirstToken(TokenTypes.IDENT).getText();
-//                                        System.out.println(className);
-//                                        
-//                                    }
-//                                }
-//                            }
-//                        }
-                        
-                        // search slist for method calls
-                        // find dots and save ident if so
-//                        if (ast.branchContains(TokenTypes.METHOD_CALL)) {
-//                            System.out.println("Method Calls found!" + ast.getText());
-//                            DetailAST nextMethod = ast.findFirstToken(TokenTypes.METHOD_CALL);
-//                            if (nextMethod.getFirstChild().getType() == TokenTypes.DOT) {
-//                                System.out.println("Possible call to another class's methods");
-//                            }
-//                            if (nextMethod != null) {
-//                                // is it from another class?
-//                                System.out.println("Now have found " + nextMethod.getText());
-//                            }
-//                        }
-            
-            //keep a array of counts
-            // if any one of the counts is greater than the count of in-class
-            // stuff, throw a flag
-//    @Override
-//    public void visitToken(DetailAST ast) {
-//        System.out.println("Hi!");
-//        if (ast.getType() == TokenTypes.METHOD_DEF) {
-//            DetailAST methodChild = ast.getFirstChild();
-//            if(methodChild != null) {
-//                System.out.println("Child 1 is " + methodChild.getText());
-//                methodChild = ast.findFirstToken(TokenTypes.SLIST);
-//                System.out.println("Found SLIST");
-//            }
-//            // search slist for method calls
-//            // find dots and save ident if so
-//            // search for var def
-//            // find and save ident if new
-//            //keep a array of counts
-//            // if any one of the counts is greater than the count of in-class
-//            // stuff, throw a flag
-//            
-//            System.out.println("Method definition found!" + ast.getText());
-//            int numberOfMethodCalls = ast.getChildCount(TokenTypes.METHOD_CALL); // get num of parameters.
-//            if (numberOfMethodCalls > 0) {
-//                System.out.println("Method Calls found!" + ast.getText());
-//                DetailAST nextMethod = ast.findFirstToken(TokenTypes.METHOD_CALL);
-//                if (nextMethod.getFirstChild().getType() == TokenTypes.DOT) {
-//                    System.out.println("Possible call to another class's methods");
-//                }
-//                if (nextMethod != null) {
-//                    // is it from another class?
-//                    System.out.println("Now have found " + nextMethod.getText());
-//                }
-//            }
-//            int numberOfDataItems = ast.getChildCount(TokenTypes.VARIABLE_DEF); // get num of parameters.
-//            if (numberOfDataItems > 0) {
-//                System.out.println("Variables found!" + ast.getText());
-//                // is it from another class?
-//                DetailAST nextVar = ast.findFirstToken(TokenTypes.VARIABLE_DEF);
-//                if (nextVar != null) {
-//                    DetailAST nextAssign = nextVar.findFirstToken(TokenTypes.EXPR);
-//                    if (nextAssign != null) {
-//                        if (nextAssign.getFirstChild().getType() == TokenTypes.LITERAL_NEW) {
-//                            System.out.println("Possible creating of new class instance");
-//                        }
-//                    }
-//                }
-//                if (nextVar != null) {
-//                    // is it from another class?
-//                    System.out.println("Now have found " + nextVar.getText());
-//                }
-//            }
-//        }
-    
-    
-        
-        // for each token child that is a variable
-//    forEachChild(DetailAST root, int type, Consumer<DetailAST> action)
-//    Performs an action for each child of DetailAST root node which matches the given token type.
-        // see if that variable is part of another class
-

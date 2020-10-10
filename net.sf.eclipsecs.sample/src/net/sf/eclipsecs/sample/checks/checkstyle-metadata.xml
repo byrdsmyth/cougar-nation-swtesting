@@ -69,18 +69,15 @@
         <rule-metadata name="%SpaghettiCode.name" internal-name="SpaghettiCode" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SpaghettiCodeCheck" />
             <description>%SpaghettiCode.desc</description>
-            <property-metadata name="countEmpty" datatype="Boolean" default-value="true">
-                <description>Control whether to count empty lines and single line comments.</description>
-            </property-metadata>
-            <property-metadata name="maxGlobalVars" datatype="Integer" default-value="5">
+          <!--  <property-metadata name="maxGlobalVars" datatype="Integer" default-value="5">
                 <description>The maximum number of global variables.</description>
             </property-metadata>
-            <property-metadata name="maxMethodLength" datatype="Integer" default-value="150">
+            <property-metadata name="maxMethodLength" datatype="Integer" default-value="5">
                 <description>The maximum allowed number of lines in a single method.</description>  
             </property-metadata>
-            <property-metadata name="maxClassLength" datatype="Integer" default-value="1500">
+            <property-metadata name="maxClassLength" datatype="Integer" default-value="5">
                 <description>The maximum number of lines in a single class.</description>
-            </property-metadata>
+            </property-metadata> -->
         </rule-metadata>
         
         <!--
