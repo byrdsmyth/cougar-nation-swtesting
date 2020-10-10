@@ -18,8 +18,8 @@
         <rule-metadata name="%Blob.name" internal-name="Blob" parent="TreeWalker">
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.BlobCheck" />
             <description>%Blob.desc</description>
-            <property-metadata name="max" datatype="Integer" default-value="100">
-                <description>The maximum number of allowed methods.</description>
+            <property-metadata name="max" datatype="Integer" default-value="10">
+                <description>The maximum number of allowed variables.</description>
             </property-metadata>
         </rule-metadata>
         

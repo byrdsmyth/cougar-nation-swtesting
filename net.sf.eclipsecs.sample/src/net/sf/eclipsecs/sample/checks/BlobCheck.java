@@ -1,10 +1,8 @@
 package net.sf.eclipsecs.sample.checks;
 
-import java.io.File;
-
-import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
-import com.puppycrawl.tools.checkstyle.StatelessCheck;
-import com.puppycrawl.tools.checkstyle.api.FileText;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /*
  * The Blob, also named God Class, is a class implementing different responsibilities,
@@ -12,27 +10,45 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
  * implement different functionalities, and by many dependencies with data classes (i.e., classes
  * implementing only getter and setter methods) [24].
  */
-@StatelessCheck
-public class BlobCheck extends AbstractFileSetCheck {
 
-	//FileLength FL = new FileLength();
+public class BlobCheck extends AbstractCheck {
+
+	private int max = 10;
+	private int variableCount = 0;
+
+	@Override
+	public int[] getAcceptableTokens() {
+		return new int[] { TokenTypes.VARIABLE_DEF };
+	}
+
+	@Override
+	public int[] getRequiredTokens() {
+		return new int[0];
+	}
+
+	@Override
+	public int[] getDefaultTokens() {
+		return new int[] {TokenTypes.VARIABLE_DEF };
+	}
+
+	public void setMax(int limit) {
+		max = limit;
+	}
+
+	@Override
+	public void visitToken(DetailAST ast) {
+	if(ast.getType() == TokenTypes.VARIABLE_DEF){
+		variableCount++;
+	 }
+	}
+	public void finishTree(DetailAST tree) {
+		log(tree.getLineNo(), "blobVar", variableCount);
+		
+		if (variableCount > max) {
+			log(tree.getLineNo(), "blobVarMax", max);
+		}
 	
-	//class FileLength extends AbstractFileSetCheck {
-		
-		//Message to display in log file
-		public static final String message = "Long Source File";
-		
-		private int max = 50; //Max number of lines allowed
-		
-		public void processFiltered(File file, FileText fText)
-		{
-			if(fText.size() > max)
-			{
-				log(1, message, fText.size(), max);
-			}
-		}
-		public void setMax(int length) {
-		        max = length;
-		}
-	//}
+		variableCount = 0;
+	}
+
 }
