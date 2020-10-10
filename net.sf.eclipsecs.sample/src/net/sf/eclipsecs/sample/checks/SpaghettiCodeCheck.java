@@ -127,6 +127,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
                     System.out.println("Method length: " + length);
                     if (length > maxMethodLength) {
+                        System.out.println("Method length too long: " + maxMethodLength);
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
                     }
                 }
@@ -146,6 +147,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
                     System.out.println("Class length: " + length);
                     if (length > maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                        System.out.println("Class length too long: " + maxClassLength);
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
                     }
                 }
@@ -160,7 +162,9 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                         if(childType.getFirstChild() != null) {
                             if (childType.getFirstChild().getType() == TokenTypes.LITERAL_PUBLIC) {
                                 this.currentGlobalsCount++;
+                                System.out.println("found public var: " + this.currentGlobalsCount);
                                 if (this.currentGlobalsCount > maxGlobalVars && this.INHERITANCE == false) {
+                                    System.out.println("found too many public var: " + this.currentGlobalsCount);
                                     this.TOO_MANY_GLOBALS = true;
                                 }
                             }
