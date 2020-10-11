@@ -113,7 +113,9 @@ public class SpaghettiCodeCheck extends AbstractCheck {
         System.out.println("token is found " + ast.getText());
         // to check inheritance look for Implements and Extends
         if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
+            System.out.println("Inheritance is " + this.INHERITANCE);
             this.INHERITANCE = true;
+            System.out.println("Inheritance now is " + this.INHERITANCE);
         }
         // look for methods that break the rules
         if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
@@ -125,9 +127,9 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                     final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
                     // make sure they are not too long
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    System.out.println("Method length: " + length);
+                    System.out.println("Method length: " + length + "Max length: " + this.maxMethodLength);
                     if (length > maxMethodLength) {
-                        System.out.println("Method length too long: " + maxMethodLength);
+                        System.out.println("Method length too long: " + this.maxMethodLength);
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
                     }
                 }
@@ -135,6 +137,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
         }
         // Look for long classes using the get length function
         if (ast.getType() == TokenTypes.CLASS_DEF) {
+            this.INHERITANCE = false;
             System.out.println("Class found ");
             currentGlobalsCount = 0;
             DetailAST block = ast.findFirstToken(TokenTypes.OBJBLOCK);
@@ -145,8 +148,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
                 if (openingBrace != null) {
                     final DetailAST closingBrace = block.findFirstToken(TokenTypes.RCURLY);
                     final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    System.out.println("Class length: " + length);
-                    if (length > maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                    System.out.println("Class length: " + length + "max class length: " + this.maxClassLength);
+                    if (length > this.maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
                         System.out.println("Class length too long: " + maxClassLength);
                         log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
                     }
