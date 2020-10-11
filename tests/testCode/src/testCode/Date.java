@@ -1,4 +1,4 @@
-package net.sf.eclipsecs.sample.checks;
+package testcode;
 
 import java.util.logging.Logger;
 import java.time.Month;
