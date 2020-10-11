@@ -1,5 +1,6 @@
 package net.sf.eclipsecs.sample.checks;
 
+
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -7,99 +8,174 @@ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 
-// classes without structure that declare long methods without parameters
-// very large classes with very long methods
-// Spaghetti Code is revealed by classes with no structure, declaring long methods with no parameters, and utilising global variables.
-// measurable properties include the concepts of long methods, methods with no parameter, inheritance; its lexical properties 
-// include the concepts of procedural names; its structural properties include the concepts of global variables, and 
-// polymorphism
-// all properties must be present to characterise a class as Spaghetti Code
-// RULE:LongMethod RULE:NoParameter RULE:NoInheritance RULE:NoPolymorphism RULE:ProceduralName RULE:UseGlobalVariable { STRUCT USE GLOBAL VARIABLE };
+/**
+ * <p>
+ * Checks for potential locations of Spaghetti Code code smells.
+ * </p>
+ * <p>
+ * This check looks for long classes with no structure, declaring 
+ * long methods with no parameters, and utilising global variables.
+ * </p>
+ * * <ul>
+ * <li>
+ * Property {@code maxGlobalVars} - Most variables per class which
+ * can be globals
+ * Type is {@code integer}.
+ * Default value is {@code 5}.
+ * </li>
+ * <li>
+ * Property {@code maxClassLength} - Size class can be before getting
+ * flagged for being too long
+ * Default value is {@code 1000}.
+ * </li>
+ * <li>
+ * Property {@code maxMethodLength} - Size methods can be before getting
+ * flagged for being too long
+ * Default value is {@code 150}.
+ * </li>
+ * </ul>
+ * <p>
+ * Parent is {@code com.puppycrawl.tools.checkstyle.TreeWalker}
+ * </p>
+ */
+
 // Attribution: based some code off of getMethodLengthCHeck on checkstyle's github page: https://github.com/checkstyle/checkstyle/blob/master/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheck.java
 public class SpaghettiCodeCheck extends AbstractCheck {
     
+    private int maxGlobalVars = 5;
+    private int maxClassLength = 1000;
+    private int maxMethodLength = 100;
+    
     /**
-     * A key is pointing to the warning message text in "messages.properties"
-     * file.
+     * Sets max number of methods.
+     * @param maxMethods
      */
-    public static final String MSG_KEY = "spaghetti";
-
-    /** Control whether to count empty lines and single line comments of the form {@code //}. */
-    private boolean countEmpty = true;
-
-    /** Specify the maximum number of lines allowed. */
-    private int DEFAULT_MAX_LINES = 150;
-    private int DEFAULT_MAX_GLOBALS = 5;
-    private int DEFAULT_MAX_METHODS = 15;
-    private int max = DEFAULT_MAX_LINES;
+    public void setMaxGlobalVars(int maxGlobalVars) {
+        System.out.println("Setting maxGlobalVars");
+        this.maxGlobalVars = maxGlobalVars;
+    }
+    
+    /**
+     * Sets max number of methods.
+     * @param maxMethods
+     */
+    public void setMaxClassLength(int maxClassLength) {
+        System.out.println("Setting class length");
+        this.maxClassLength = maxClassLength;
+    }
+    
+    /**
+     * Sets max number of methods.
+     * @param maxMethods
+     */
+    public void setMaxLines(int maxMethodLength) {
+        System.out.println("Setting method length");
+        this.maxMethodLength = maxMethodLength;
+    }
+    
     private int currentGlobalsCount = 0;
-    private boolean METHOD_TOO_LONG = false;
-    private boolean CLASS_TOO_LONG = false;
+    
+    /** Vars for local use only **/
+    private boolean TOO_MANY_GLOBALS = false;
     private boolean INHERITANCE = false;
 
+    /**
+    /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
     @Override
     public int[] getDefaultTokens() {
         // begin with ones for checking length of method
-        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF };
+        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
+                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF };
     }
 
+    /* returns a set, which contains all the TokenTypes that can be processed by the check. 
+     * Both DefaultTokens and RequiredTokens and any custom set of TokenTypes are subsets 
+     * of AcceptableTokens. */
     @Override
     public int[] getAcceptableTokens() {
         return getRequiredTokens();
     }
 
+    /* returns a set of TokenTypes which Check must be subscribed to for a valid execution. 
+     * If the user wants to specify a custom set of TokenTypes then this set must contain 
+     * all the TokenTypes from RequiredTokens. */
     @Override
     public int[] getRequiredTokens() {
         return new int[0];
     }
     
+    /**
+     * Sets max number of methods.
+     * @param maxMethods
+     */
     @Override
     public void visitToken(DetailAST ast) {
-        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
-            //look for long methods with no parameters
-            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
-            if (numberOfParameters == 0) {
-                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
-                if (openingBrace != null) {
-                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
-                    final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    if (length > max) {
-                        this.METHOD_TOO_LONG = true;
-                        log(ast, "Long parameter with no methods stinks of Spaghetti code");
-                    }
-                }
-            }
-        }
-        // to find global variables: search for public variable at top-level of class
-        if (ast.getType() == TokenTypes.OBJBLOCK) {
-            // look for Var defs that are immediate children
-            DetailAST blockChild = ast.getFirstChild();
-            while (blockChild != null) {
-                if(blockChild.getType() != TokenTypes.VARIABLE_DEF) {
-                    blockChild = blockChild.getNextSibling();
-                }
-                else {
-                    DetailAST childType = blockChild.findFirstToken(TokenTypes.TYPE);
-                    if (childType.getText() == "public") {
-                        this.currentGlobalsCount++;
-                    }
-                }
-            }
-        }
+        System.out.println("token is found " + ast.getText());
         // to check inheritance look for Implements and Extends
         if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
             this.INHERITANCE = true;
         }
+        // look for methods that break the rules
+        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
+            //look for long methods with no parameters
+            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
+            if (numberOfParameters == 0 && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
+                if (openingBrace != null) {
+                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
+                    // make sure they are not too long
+                    final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    System.out.println("Method length: " + length);
+                    if (length > maxMethodLength) {
+                        System.out.println("Method length too long: " + maxMethodLength);
+                        log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
+                    }
+                }
+            }
+        }
         // Look for long classes using the get length function
         if (ast.getType() == TokenTypes.CLASS_DEF) {
+            System.out.println("Class found ");
+            currentGlobalsCount = 0;
             DetailAST block = ast.findFirstToken(TokenTypes.OBJBLOCK);
-            final DetailAST openingBrace = block.findFirstToken(TokenTypes.LCURLY);
-            if (openingBrace != null) {
-                final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
-                final int length = getLengthOfBlock(openingBrace, closingBrace);
-                if (length > max) {
-                    this.CLASS_TOO_LONG = true;
-                    log(ast, "Long parameter with no methods stinks of Spaghetti code");
+            // to find global variables: search for public variable at top-level of class
+            if (block != null) {
+                System.out.println("OBJBLOCK found ");
+                final DetailAST openingBrace = block.findFirstToken(TokenTypes.LCURLY);
+                if (openingBrace != null) {
+                    final DetailAST closingBrace = block.findFirstToken(TokenTypes.RCURLY);
+                    final int length = getLengthOfBlock(openingBrace, closingBrace);
+                    System.out.println("Class length: " + length);
+                    if (length > maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                        System.out.println("Class length too long: " + maxClassLength);
+                        log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
+                    }
+                }
+                // look for Var defs that are immediate children of objblock
+                DetailAST blockChild = openingBrace.getNextSibling();
+                while (blockChild != null) {
+                    if(blockChild.getType() != TokenTypes.VARIABLE_DEF) {
+                        blockChild = blockChild.getNextSibling();
+                    }
+                    else {
+                        DetailAST childType = blockChild.findFirstToken(TokenTypes.MODIFIERS);
+                        if(childType.getFirstChild() != null) {
+                            if (childType.getFirstChild().getType() == TokenTypes.LITERAL_PUBLIC) {
+                                this.currentGlobalsCount++;
+                                System.out.println("found public var: " + this.currentGlobalsCount);
+                                if (this.currentGlobalsCount > maxGlobalVars && this.INHERITANCE == false) {
+                                    System.out.println("found too many public var: " + this.currentGlobalsCount);
+                                    this.TOO_MANY_GLOBALS = true;
+                                }
+                            }
+                        }
+                    }
+                    if(blockChild != null && blockChild.getNextSibling() != null) {
+                        blockChild = blockChild.getNextSibling();
+                    }
+                    else {
+                        blockChild = null;
+                    }
                 }
             }
         }
@@ -116,18 +192,18 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     private int getLengthOfBlock(DetailAST openingBrace, DetailAST closingBrace) {
         int length = closingBrace.getLineNo() - openingBrace.getLineNo() + 1;
 
-        if (!countEmpty) {
-            final FileContents contents = getFileContents();
-            final int lastLine = closingBrace.getLineNo();
-            // lastLine - 1 is actual last line index. Last line is line with curly brace,
-            // which is always not empty. So, we make it lastLine - 2 to cover last line that
-            // actually may be empty.
-            for (int i = openingBrace.getLineNo() - 1; i <= lastLine - 2; i++) {
-                if (contents.lineIsBlank(i) || contents.lineIsComment(i)) {
-                    length--;
-                }
-            }
-        }
+//        if (!countEmpty) {
+//            final FileContents contents = getFileContents();
+//            final int lastLine = closingBrace.getLineNo();
+//            // lastLine - 1 is actual last line index. Last line is line with curly brace,
+//            // which is always not empty. So, we make it lastLine - 2 to cover last line that
+//            // actually may be empty.
+//            for (int i = openingBrace.getLineNo() - 1; i <= lastLine - 2; i++) {
+//                if (contents.lineIsBlank(i) || contents.lineIsComment(i)) {
+//                    length--;
+//                }
+//            }
+//        }
         return length;
     }
 
