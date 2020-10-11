@@ -36,14 +36,6 @@ public class Date {
 	
 	/**Method used to set the dateName, dateNumber, and zodiacsign using the parameter in the constructor*/
 	public void initalizeAttributes() {
-
-		if(validRangeForDay(dd) && validRangeForMonth(mm) && validRangeForYear(yyyy)) {
-			this.dayNumber= dateToDayNumber();
-			this.dayName= dateToDayName();
-			this.zodiacSign=zodiacSign();
-		} else {
-			System.out.println("Cannot initalize attributes since a dd, mm, or yyyy is invalid");
-		}
 		
 		Object obj = validRangeForDay(dd);
 		int a = 0;
@@ -65,6 +57,14 @@ public class Date {
 		
 		if(a == 0 || a <= 1 || b >= 2 && c == 6 && d != 0 || a == 7 && a == 9) {
 			
+		}
+		
+		if(validRangeForDay(dd) && validRangeForMonth(mm) && validRangeForYear(yyyy)) {
+			this.dayNumber= dateToDayNumber();
+			this.dayName= dateToDayName();
+			this.zodiacSign=zodiacSign();
+		} else {
+			System.out.println("Cannot initalize attributes since a dd, mm, or yyyy is invalid");
 		}
 	}
 
@@ -153,8 +153,7 @@ public class Date {
 
 	//validCombination will return true if the parameters are a valid combination 
 	public static boolean validCombination(int thisDay,int thisMonth,int thisYear){
-		if ((thisDay == 31) && ((thisMonth == 2) || (thisMonth ==4) ||
-				(thisMonth == 6) || (thisMonth == 8) || (thisMonth == 11))) {
+		if ((thisDay == 31) && ((thisMonth == 2) || (thisMonth ==4) || (thisMonth == 6) || (thisMonth == 8) || (thisMonth == 11))) {
 			System.out.println("Day = "+thisDay+" cannot happen when month is"+ thisMonth);
 			return false;
 		}
@@ -297,6 +296,7 @@ public class Date {
 		if(!isLeap(yyyy)) {
 			day = day-1;
 		}
+		
 		switch(day) {
 			case 1:
 				dayName = "Fri";

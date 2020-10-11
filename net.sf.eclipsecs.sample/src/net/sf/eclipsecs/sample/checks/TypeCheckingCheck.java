@@ -85,9 +85,10 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForInstances(final DetailAST ast) {
 		  if (ast.getType() == TokenTypes.EXPR) {
-			  //instanceof is a child of EXPR
+			  //
 			  final DetailAST firstChild = ast.getFirstChild();
 			  final DetailAST lastChild = ast.getLastChild();
+			  //Get both children to look for instanceOf
 			  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
 				  instances++;
 				  if(instances >= MAX_INSTANCEOF) {
@@ -103,15 +104,15 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForLongLogic(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.LITERAL_IF) {
-			  System.out.println("IF statement found: ");
-			  final String values = ast.toStringList();
-			  int count = 0;
-			  count = count(values, "&&");
-			  count = count(values, "||");
-			  if(count >= MAX_OR_ANDS) {
+			  String values = ast.toStringList();
+			  
+			  int countOr, countAnd, total = 0;
+			  countAnd = count(values, "&&");
+			  countOr = count(values, "||");
+			  total = countOr + countAnd;
+			  if(total >= MAX_OR_ANDS) {
 				  log(ast.getLineNo(), "Type Check violation detected: Too many logic operations per Literal IF: ");
 			  }
-			  count = 0;
 		  }
 		  
 	  }
@@ -131,5 +132,5 @@ public class TypeCheckingCheck extends AbstractCheck{
 		       lastIndex += find.length() - 1;
 		  }
 	      return count;
-	}
+	  }
 }
