@@ -30,7 +30,7 @@ Njuguna, Jesse W
   20. Go to the Window menu > show > other > select the two views under checkstyle
   21. You should now see the Checkstyle error for our custom checks
 
-Steps....
+SETUP STEPS FOR USING GITHUB:
 First Time:
 1)git config -global user.name "username"
 2)git config -global user.email "email"
