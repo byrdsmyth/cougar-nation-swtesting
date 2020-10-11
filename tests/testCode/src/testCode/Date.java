@@ -1,4 +1,4 @@
-package testcode;
+package testCode;
 
 import java.util.logging.Logger;
 import java.time.Month;
