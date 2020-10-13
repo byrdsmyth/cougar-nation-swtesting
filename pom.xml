@@ -19,7 +19,7 @@
                     <archive>
                         <manifest>
                             <!-- give full qualified name of your main class-->
-                            <mainClass>com.wsu.MainClass</mainClass>
+                            <mainClass>com.wsu.Calendar</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
