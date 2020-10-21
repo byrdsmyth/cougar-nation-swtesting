@@ -11,12 +11,12 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class TypeCheckingCheck extends AbstractCheck{
 
       //Static data members used for max amount of logical tokens
-      private static final int MAX_INSTANCEOF = 1;
-      private static final int MAX_SWITCHES = 2;
-      private static final long MAX_OR_ANDS = 5;
-      private static final int MAX_CASES = 6;
+      private int max_instances = 1;
+      private int max_switches = 2;
+      private long max_and_ors = 5;
+      private int max_cases = 6;
       
-      //Data Memebers to count the instances of logical tokens
+      //Data Members to count the instances of logical tokens
       
       /**Data Member to keep track of how many "instanceof" Tokens were found*/
       private int instances = 0;
@@ -24,7 +24,39 @@ public class TypeCheckingCheck extends AbstractCheck{
       /**Data Memeber to keep track of how many switch statements were found*/
       private int switches = 0;
       
-
+      public void setMaxInstanceOf(int i) {
+    	  max_instances = i;
+      }
+      
+      public void setMaxSwitches(int i) {
+    	  max_switches = i;
+      }
+      
+      public void setMaxAndOrs(int i ) {
+    	  max_and_ors = i;
+      }
+      
+      public void setMaxCases(int i) {
+    	  max_cases = i;
+      }
+      
+      public int getMaxInstanceOf() {
+    	  return max_instances;
+      }
+      
+      public long getMaxAndOrs() {
+    	  return max_and_ors;
+      }
+      
+      public int getMaxCases() {
+    	  return max_cases;
+      }
+      
+      public int getMaxSwitches() {
+    	  return max_switches;
+      }
+      
+      
       @Override
       /**{@inheritDoc}*/
       public int[] getAcceptableTokens() {
@@ -65,7 +97,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 	  private final void checkForSwitchStatements(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.CASE_GROUP) {
 			  //The children in the Tree should be the amount of "Case:" 
-			  if(ast.getChildCount() >= MAX_CASES) {
+			  if(ast.getChildCount() >= max_cases) {
 				  log(ast.getLineNo(), "Type Check violation detected:  Too many cases inside a switch: " + ast.getChildCount());
 			  }
 			  
@@ -73,7 +105,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 		  //Literal Switch equals "switch(value)"
 		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
 			  switches++;
-			  if(switches >= MAX_SWITCHES) {
+			  if(switches >= max_switches) {
 				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches: " + switches);
 			  }
 		  }
@@ -89,10 +121,12 @@ public class TypeCheckingCheck extends AbstractCheck{
 			  final DetailAST firstChild = ast.getFirstChild();
 			  final DetailAST lastChild = ast.getLastChild();
 			  //Get both children to look for instanceOf
-			  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
-				  instances++;
-				  if(instances >= MAX_INSTANCEOF) {
-					  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof: " + instances);
+			  if(firstChild != null && lastChild != null) {
+				  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
+					  instances++;
+					  if(instances >= max_instances) {
+						  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof: " + instances);
+					  }
 				  }
 			  }
 		  }
@@ -110,7 +144,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 			  countAnd = count(values, "&&");
 			  countOr = count(values, "||");
 			  total = countOr + countAnd;
-			  if(total >= MAX_OR_ANDS) {
+			  if(total >= max_and_ors) {
 				  log(ast.getLineNo(), "Type Check violation detected: Too many logic operations per Literal IF: ");
 			  }
 		  }
