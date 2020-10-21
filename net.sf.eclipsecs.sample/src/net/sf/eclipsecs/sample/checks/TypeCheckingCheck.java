@@ -1,6 +1,10 @@
 
 package net.sf.eclipsecs.sample.checks;
 
+import static org.mockito.Matchers.intThat;
+
+import org.springframework.util.StringUtils;
+
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -11,10 +15,10 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class TypeCheckingCheck extends AbstractCheck{
 
       //Static data members used for max amount of logical tokens
-      private int max_instances = 1;
-      private int max_switches = 2;
+      private int max_instances = 2;
+      private int max_switches = 1;
       private long max_and_ors = 5;
-      private int max_cases = 6;
+      private int max_cases = 4;
       
       //Data Members to count the instances of logical tokens
       
@@ -23,6 +27,8 @@ public class TypeCheckingCheck extends AbstractCheck{
       
       /**Data Memeber to keep track of how many switch statements were found*/
       private int switches = 0;
+      
+      private int cases = 0;
       
       public void setMaxInstanceOf(int i) {
     	  max_instances = i;
@@ -86,7 +92,8 @@ public class TypeCheckingCheck extends AbstractCheck{
 	  public void visitToken(DetailAST ast) {
 		  checkForInstances(ast);
 		  checkForSwitchStatements(ast);
-		  checkForLongLogic(ast);	  
+		  checkForLongLogic(ast);
+		  checkForCasesInSwitch(ast);
 	  }
 	  
 	  /**
@@ -95,18 +102,21 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   * @param ast - DetaiST
 	   */
 	  private final void checkForSwitchStatements(final DetailAST ast) {
-		  if(ast.getType() == TokenTypes.CASE_GROUP) {
-			  //The children in the Tree should be the amount of "Case:" 
-			  if(ast.getChildCount() >= max_cases) {
-				  log(ast.getLineNo(), "Type Check violation detected:  Too many cases inside a switch: " + ast.getChildCount());
-			  }
-			  
-		  }
 		  //Literal Switch equals "switch(value)"
 		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
 			  switches++;
 			  if(switches >= max_switches) {
-				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches: " + switches);
+				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches");
+			  }
+		  }
+	  }
+	  
+	  private final void checkForCasesInSwitch(final DetailAST ast) {
+		//Literal Switch equals "switch(value)"
+		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
+			  int caseChildren = ast.getChildCount(TokenTypes.CASE_GROUP);
+			  if(caseChildren >= max_cases) {
+				  log(ast.getLineNo(), "Type Check violation detected:  Too many cases in switch");
 			  }
 		  }
 	  }
@@ -125,7 +135,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 				  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
 					  instances++;
 					  if(instances >= max_instances) {
-						  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof: " + instances);
+						  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof");
 					  }
 				  }
 			  }
@@ -138,14 +148,18 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForLongLogic(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.LITERAL_IF) {
-			  String values = ast.toStringList();
-			  
-			  int countOr, countAnd, total = 0;
-			  countAnd = count(values, "&&");
-			  countOr = count(values, "||");
-			  total = countOr + countAnd;
-			  if(total >= max_and_ors) {
-				  log(ast.getLineNo(), "Type Check violation detected: Too many logic operations per Literal IF: ");
+			  String values = ast.toStringTree();
+			  if(values.indexOf("(") != -1 && values.indexOf(";") != -1) {
+				  String substring =  values.substring(values.indexOf("(") + 1, values.indexOf(";"));
+				  int countOr, countAnd, total = 0;
+				  countAnd = count(substring, "&&");
+				  countOr = count(substring, "||");
+				  total = countOr + countAnd;
+				  System.out.println(total);
+				  System.out.println(substring);
+				  if(total >= max_and_ors) {
+					  log(ast.getLineNo(), "Type Check violation detected: Too many logical operations per line");
+				  }
 			  }
 		  }
 		  
