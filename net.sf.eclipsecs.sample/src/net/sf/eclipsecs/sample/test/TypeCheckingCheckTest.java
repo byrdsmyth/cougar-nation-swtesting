@@ -1,4 +1,4 @@
-package net.sf.eclipsecs.sample.checks;
+package net.sf.eclipsecs.sample.test;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
+import net.sf.eclipsecs.sample.checks.TypeCheckingCheck;
+
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.mockito.verification.PrivateMethodVerification;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -132,6 +135,18 @@ public class TypeCheckingCheckTest {
 		
 		ReflectionTestUtils.setField(tc, "switches", 1);
 		ReflectionTestUtils.invokeMethod(tc,"checkForSwitchStatements", ast);
+	}
+	
+	@Test
+	public void testCheckForCasesInSwitch() {
+		TypeCheckingCheck tc = new TypeCheckingCheck();	
+		tc.setMaxCases(3);
+		DetailAST ast = new DetailAST();
+		ast.setType(TokenTypes.LITERAL_SWITCH);
+		
+		ReflectionTestUtils.setField(tc, "cases", 1);
+		ReflectionTestUtils.invokeMethod(tc,"checkForCasesInSwitch", ast);
+		
 	}
 	
 	@Test

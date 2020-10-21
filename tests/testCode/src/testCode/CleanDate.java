@@ -1,10 +1,13 @@
 package com.wsu;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Date {
-	
+public class CleanDate {
 	/**Logger for debugging*/
+	
+	Map<Integer, String> dateToDayMap = new HashMap<Integer, String>();
 
 	private int mm;
 	private int dd;
@@ -22,7 +25,7 @@ public class Date {
 	 * @param mm - the month in the year
 	 * @param yyyy - the four digit year
 	 */
-	public Date(int dd,int mm,int yyyy){	
+	public CleanDate(int dd,int mm,int yyyy){	
 		this.mm=mm;
 		this.dd=dd;
 		this.yyyy=yyyy;
@@ -41,11 +44,13 @@ public class Date {
 			System.out.println("Cannot initalize attributes since a dd, mm, or yyyy is invalid");
 		}
 		
-		if(dayName instanceof String) {
-			
-		} else if(dayName instanceof Object) {
-			
-		}
+		dateToDayMap.put(1, "Fri");
+		dateToDayMap.put(2, "Sat");
+		dateToDayMap.put(3, "Sun");
+		dateToDayMap.put(4, "Mon");
+		dateToDayMap.put(5, "Tues");
+		dateToDayMap.put(6, "Wed");
+		dateToDayMap.put(7, "Thu");
 	}
 	
 	// Returns the date in the following format:
@@ -59,34 +64,53 @@ public class Date {
 		this.mm = month;
 		this.dd = day;
 	}
+	
+	public boolean checkZodiacDates(int month, int day1, int day2) {
+		if(getMm() == month && getDd() >= day1 && getDd() <= day2) {
+			return true;
+		} else {
+			return false;		
+		}
+	}
 
 	// Returns the zodiac sign 
 	public String zodiacSign(){
-		if ((getMm() == 12 && getDd() >= 22 && getDd() <= 31) || (getMm() == 1 && getDd() >= 1 && getDd() <= 19))
+		if(checkZodiacDates(12, 22, 31) || checkZodiacDates(1, 1, 19)) {
 			return "Capricorn";
-		else if ((getMm() ==  1 && getDd() >= 20 && getDd() <= 31) || (getMm() == 2 && getDd() >= 1 && getDd() <= 18))
+		}		
+		if(checkZodiacDates(1, 20, 31) || checkZodiacDates(2, 1, 18)) {
 			return "Aquarius";
-		else if ((getMm() ==  2 && getDd() >= 19 && getDd() <= 29) || (getMm() == 3 && getDd() >= 1 && getDd() <= 20))
+		}		
+		if(checkZodiacDates(2,19, 29) || checkZodiacDates(3, 1, 20)) {
 			return "Pisces";
-		else if ((getMm() ==  3 && getDd() >= 20 && getDd() <= 31) || (getMm() == 4 && getDd() >= 1 && getDd() <= 19))
+		} 
+		if(checkZodiacDates(3,20, 31) || checkZodiacDates(4, 1, 19)) {
 			return "Aries";
-		else if ((getMm() ==  4 && getDd() >= 20 && getDd() <= 30) || (getMm() == 5 && getDd() >= 1 && getDd() <= 20))
+		}
+		if(checkZodiacDates(4,20, 30) || checkZodiacDates(5, 1, 20)) {
 			return "Taurus";
-		else if ((getMm() ==  5 && getDd() >= 21 && getDd() <= 31) || (getMm() == 6 && getDd() >= 1 && getDd() <= 20))
+		} 
+		if(checkZodiacDates(5,21, 31) || checkZodiacDates(6, 1, 20)) {
 			return "Gemini";
-		else if ((getMm() ==  6 && getDd() >= 21 && getDd() <= 30) || (getMm() == 7 && getDd() >= 1 && getDd() <= 22))
+		}
+		if(checkZodiacDates(6,21, 30) || checkZodiacDates(7, 1, 22)) {
 			return "Cancer";
-		else if ((getMm() ==  7 && getDd() >= 23 && getDd() <= 31) || (getMm() == 8 && getDd() >= 1 && getDd() <= 22))
+		}
+		if(checkZodiacDates(7,23, 31) || checkZodiacDates(8, 1, 22)) {
 			return "Leo";
-		else if ((getMm() ==  8 && getDd() >= 23 && getDd() <= 31) || (getMm() == 9 && getDd() >= 1 && getDd() <= 22))
+		}
+		if(checkZodiacDates(8,23, 31) || checkZodiacDates(9, 1, 22)) {
 			return "Virgo";
-		else if ((getMm() ==  9 && getDd() >= 23 && getDd() <= 30) || (getMm() == 10 && getDd() >= 1 && getDd() <= 22))
+		}
+		if(checkZodiacDates(9,23, 30) || checkZodiacDates(10, 1, 22)) {
 			return "Libra";
-		else if ((getMm() == 10 && getDd() >= 23 && getDd() <= 31) || (getMm() == 11 && getDd() >= 1 && getDd() <= 21))
+		} 
+		if(checkZodiacDates(10,23, 31) || checkZodiacDates(11, 1, 21)) {
 			return "Scorpio";
-		else if ((getMm() == 11 && getDd() >= 22 && getDd() <= 30) || (getMm() == 12 && getDd() >= 1 && getDd() <= 21))
+		} 
+		if(checkZodiacDates(11,22, 30) || checkZodiacDates(12, 1, 21)) {
 			return "Sagittarius";
-		else
+		} else
 			return "";
 	}
 
@@ -129,10 +153,12 @@ public class Date {
 
 	//validCombination will return true if the parameters are a valid combination 
 	public static boolean validCombination(int thisDay,int thisMonth,int thisYear){
-		if ((thisDay == 31) && ((thisMonth == 2) || (thisMonth ==4) ||
-				(thisMonth == 6) || (thisMonth == 8) || (thisMonth == 11))) {
-			System.out.println("Day = "+thisDay+" cannot happen when month is"+ thisMonth);
-			return false;
+		int[] months = new int[]{2, 4, 6, 8, 11};
+		for(int i = 0; i < months.length; i++) {
+			if(thisDay == 31 && thisMonth == months[i]) {
+				System.out.println("Day = "+thisDay+" cannot happen when month is"+ thisMonth);
+				return false;
+			}
 		}
 		if ((thisDay == 30) && (thisMonth == 2))
 		{
@@ -273,30 +299,7 @@ public class Date {
 		if(!isLeap(yyyy)) {
 			day = day-1;
 		}
-		switch(day) {
-			case 1:
-				dayName = "Fri";
-				break;
-			case 2:
-				dayName = "Sat";
-				break;
-			case 3:
-				dayName = "Sun";
-				break;
-			case 4:
-				dayName = "Mon";
-				break;
-			case 5:
-				dayName = "Tue";
-				break;
-			case 6:
-				dayName = "Wed";
-				break;
-			case 7:
-				dayName = "Thu";
-				break;
-		}
+		dayName = dateToDayMap.get(Integer.valueOf(day));
 		return dayName;
 	}
-	
 }
