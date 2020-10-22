@@ -2,3 +2,7 @@ net.sf.eclipsecs.doc/docs/
 */bin/
 */target/
 */.DS_Store                     
+net.sf.eclipsecs.sample/.classpath
+net.sf.eclipsecs.sample/.cvsignore
+net.sf.eclipsecs.sample/.project
+net.sf.eclipsecs.sample/src/net/sf/eclipsecs/sample/.DS_Store
