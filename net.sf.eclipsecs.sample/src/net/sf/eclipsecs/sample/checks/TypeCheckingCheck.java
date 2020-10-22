@@ -1,6 +1,10 @@
 
 package net.sf.eclipsecs.sample.checks;
 
+import static org.mockito.Matchers.intThat;
+
+import org.springframework.util.StringUtils;
+
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -11,12 +15,12 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class TypeCheckingCheck extends AbstractCheck{
 
       //Static data members used for max amount of logical tokens
-      private static final int MAX_INSTANCEOF = 1;
-      private static final int MAX_SWITCHES = 2;
-      private static final long MAX_OR_ANDS = 5;
-      private static final int MAX_CASES = 6;
+      private int max_instances = 2;
+      private int max_switches = 1;
+      private long max_and_ors = 5;
+      private int max_cases = 4;
       
-      //Data Memebers to count the instances of logical tokens
+      //Data Members to count the instances of logical tokens
       
       /**Data Member to keep track of how many "instanceof" Tokens were found*/
       private int instances = 0;
@@ -24,7 +28,41 @@ public class TypeCheckingCheck extends AbstractCheck{
       /**Data Memeber to keep track of how many switch statements were found*/
       private int switches = 0;
       
-
+      private int cases = 0;
+      
+      public void setMaxInstanceOf(int i) {
+    	  max_instances = i;
+      }
+      
+      public void setMaxSwitches(int i) {
+    	  max_switches = i;
+      }
+      
+      public void setMaxAndOrs(int i ) {
+    	  max_and_ors = i;
+      }
+      
+      public void setMaxCases(int i) {
+    	  max_cases = i;
+      }
+      
+      public int getMaxInstanceOf() {
+    	  return max_instances;
+      }
+      
+      public long getMaxAndOrs() {
+    	  return max_and_ors;
+      }
+      
+      public int getMaxCases() {
+    	  return max_cases;
+      }
+      
+      public int getMaxSwitches() {
+    	  return max_switches;
+      }
+      
+      
       @Override
       /**{@inheritDoc}*/
       public int[] getAcceptableTokens() {
@@ -54,7 +92,8 @@ public class TypeCheckingCheck extends AbstractCheck{
 	  public void visitToken(DetailAST ast) {
 		  checkForInstances(ast);
 		  checkForSwitchStatements(ast);
-		  checkForLongLogic(ast);	  
+		  checkForLongLogic(ast);
+		  checkForCasesInSwitch(ast);
 	  }
 	  
 	  /**
@@ -63,18 +102,21 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   * @param ast - DetaiST
 	   */
 	  private final void checkForSwitchStatements(final DetailAST ast) {
-		  if(ast.getType() == TokenTypes.CASE_GROUP) {
-			  //The children in the Tree should be the amount of "Case:" 
-			  if(ast.getChildCount() >= MAX_CASES) {
-				  log(ast.getLineNo(), "Type Check violation detected:  Too many cases inside a switch: " + ast.getChildCount());
-			  }
-			  
-		  }
 		  //Literal Switch equals "switch(value)"
 		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
 			  switches++;
-			  if(switches >= MAX_SWITCHES) {
-				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches: " + switches);
+			  if(switches >= max_switches) {
+				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches");
+			  }
+		  }
+	  }
+	  
+	  private final void checkForCasesInSwitch(final DetailAST ast) {
+		//Literal Switch equals "switch(value)"
+		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
+			  int caseChildren = ast.getChildCount(TokenTypes.CASE_GROUP);
+			  if(caseChildren >= max_cases) {
+				  log(ast.getLineNo(), "Type Check violation detected:  Too many cases in switch");
 			  }
 		  }
 	  }
@@ -85,13 +127,16 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForInstances(final DetailAST ast) {
 		  if (ast.getType() == TokenTypes.EXPR) {
-			  //instanceof is a child of EXPR
+			  //
 			  final DetailAST firstChild = ast.getFirstChild();
 			  final DetailAST lastChild = ast.getLastChild();
-			  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
-				  instances++;
-				  if(instances >= MAX_INSTANCEOF) {
-					  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof: " + instances);
+			  //Get both children to look for instanceOf
+			  if(firstChild != null && lastChild != null) {
+				  if(firstChild.getType() == TokenTypes.LITERAL_INSTANCEOF || lastChild.getType() == TokenTypes.LITERAL_INSTANCEOF) {
+					  instances++;
+					  if(instances >= max_instances) {
+						  log(ast.getLineNo(), "Type Check violation detected:  Too many instances of instanceof");
+					  }
 				  }
 			  }
 		  }
@@ -103,15 +148,19 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForLongLogic(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.LITERAL_IF) {
-			  System.out.println("IF statement found: ");
-			  final String values = ast.toStringList();
-			  int count = 0;
-			  count = count(values, "&&");
-			  count = count(values, "||");
-			  if(count >= MAX_OR_ANDS) {
-				  log(ast.getLineNo(), "Type Check violation detected: Too many logic operations per Literal IF: ");
+			  String values = ast.toStringTree();
+			  if(values.indexOf("(") != -1 && values.indexOf(";") != -1) {
+				  String substring =  values.substring(values.indexOf("(") + 1, values.indexOf(";"));
+				  int countOr, countAnd, total = 0;
+				  countAnd = count(substring, "&&");
+				  countOr = count(substring, "||");
+				  total = countOr + countAnd;
+				  System.out.println(total);
+				  System.out.println(substring);
+				  if(total >= max_and_ors) {
+					  log(ast.getLineNo(), "Type Check violation detected: Too many logical operations per line");
+				  }
 			  }
-			  count = 0;
 		  }
 		  
 	  }
@@ -131,5 +180,5 @@ public class TypeCheckingCheck extends AbstractCheck{
 		       lastIndex += find.length() - 1;
 		  }
 	      return count;
-	}
+	  }
 }

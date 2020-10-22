@@ -1,10 +1,10 @@
-package BlobTestCode;
+package testCode;
 
 /*
  * Test configuration assumes the max vairable and method count to 3
  */
 
-public class blobTestItems {
+public class Blob {
 
 	public static void main(String[] args) {
 		
