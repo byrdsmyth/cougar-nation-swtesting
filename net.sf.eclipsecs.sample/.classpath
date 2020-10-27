@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ryanlodermeier/.p2/pool/plugins/org.evosuite.plugins.eclipse.deps_1.0.7.201806011952/lib/evosuite.jar"/>
-	<classpathentry kind="src" path="evosuite-tests"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ryanlodermeier/Downloads/commons-cli-1.4-src/target/classes/evosuite-standalone-runtime-1.0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ryanlodermeier/Downloads/checkstyle-8.36.2-all.jar"/>
 	<classpathentry kind="lib" path="/Users/ryanlodermeier/Downloads/spring-2.3.4.RELEASE/lib/spring-boot-cli-2.3.4.RELEASE.jar"/>
