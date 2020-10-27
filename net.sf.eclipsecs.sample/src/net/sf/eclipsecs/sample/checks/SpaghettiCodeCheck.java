@@ -47,7 +47,7 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     private int maxMethodLength = 100;
     
     /**
-     * Sets max number of methods.
+     * Sets max number of global variables.
      * @param maxMethods
      */
     public void setMaxGlobalVars(int maxGlobalVars) {
@@ -56,7 +56,15 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     }
     
     /**
-     * Sets max number of methods.
+     * Gets max number of global variables.
+     * @param maxMethods
+     */
+    public int getMaxGlobalVars() {
+        return maxGlobalVars;
+    }
+    
+    /**
+     * Sets max length of any one class.
      * @param maxMethods
      */
     public void setMaxClassLength(int maxClassLength) {
@@ -65,12 +73,28 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     }
     
     /**
-     * Sets max number of methods.
+     * Gets max length of any one class.
+     * @param maxMethods
+     */
+    public int getMaxClassLength() {
+        return this.maxClassLength;
+    }
+    
+    /**
+     * Sets max number of lines in any one method.
      * @param maxMethods
      */
     public void setMaxLines(int maxMethodLength) {
         System.out.println("Setting method length");
         this.maxMethodLength = maxMethodLength;
+    }
+    
+    /**
+     * Sets max number of lines in any one method.
+     * @param maxMethods
+     */
+    public int getMaxLines() {
+        return this.maxMethodLength;
     }
     
     private int currentGlobalsCount = 0;
@@ -84,8 +108,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     @Override
     public int[] getDefaultTokens() {
         // begin with ones for checking length of method
-        return new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
-                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF };
+        return new int[] {TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
+                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF};
     }
 
     /* returns a set, which contains all the TokenTypes that can be processed by the check. 

@@ -75,46 +75,63 @@ public class FeatureEnvyCheck extends AbstractCheck {
             System.out.println("sibling is : " + sibling.getText());
             // while sibling is not SLIST or null
             // get next sibling
-            while (sibling != null) {
-                System.out.println("Sibling while looking for SLIST: " + sibling.getText());
-                    if (sibling.getType() == TokenTypes.SLIST) {
-                        System.out.println("SLIST FOUND");
-                        // Pass to a function to count the number of variables and method calls
-                        DetailAST s_list_child = sibling.getFirstChild();
-                        while (s_list_child != null) {
-                            // Cycle through children looking for method calls
-                            String class_called = checkSLIST(s_list_child);
-                            if (((Hashtable<String, Integer>) classFeatures).containsKey(class_called)) {
-                                classFeatures.put(class_called, classFeatures.get(class_called) + 1);
-                            } else {
-                                classFeatures.put(class_called, 1);
-                            }
-                            s_list_child = s_list_child.getNextSibling();
-                        }
+            
+            findClassCalls(sibling, classFeatures);
+            
+            }
+        countInstances(classFeatures, child);
+    }
+
+    public Dictionary<String, Integer> findClassCalls(DetailAST sibling, Dictionary<String, Integer> classFeatures) {
+        // while sibling is not SLIST or null
+        // get next sibling
+        while (sibling != null) {
+            System.out.println("Sibling while looking for SLIST: " + sibling.getText());
+            if (sibling.getType() == TokenTypes.SLIST) {
+                System.out.println("SLIST FOUND");
+                // Pass to a function to count the number of variables and method calls
+                DetailAST s_list_child = sibling.getFirstChild();
+                while (s_list_child != null) {
+                    // Cycle through children looking for method calls
+                    String class_called = checkSLIST(s_list_child);
+                    if (((Hashtable<String, Integer>) classFeatures).containsKey(class_called)) {
+                        classFeatures.put(class_called, classFeatures.get(class_called) + 1);
+                    } else {
+                        classFeatures.put(class_called, 1);
                     }
-                    sibling = sibling.getNextSibling();
+                    s_list_child = s_list_child.getNextSibling();
                 }
             }
-        System.out.println("Classes: " + classFeatures);
-        int thisClassCount = 0;
-        if (classFeatures.get("this") != null) {
-            thisClassCount = classFeatures.get("this");
+            sibling = sibling.getNextSibling();
         }
-        Enumeration<String> e = classFeatures.keys();
+        return classFeatures;
+    }
+    
+    public void countInstances(Dictionary<String, Integer> instanceDict, 
+            DetailAST child) {
+        // now we count how many references to internal
+        // vars and compare to external vars
+        System.out.println("Classes: " + instanceDict);
+        int thisClassCount = 0;
+        if (instanceDict.get("this") != null) {
+            thisClassCount = instanceDict.get("this");
+        }
+        Enumeration<String> e = instanceDict.keys();
         while(e.hasMoreElements()) {
             String k = e.nextElement();
-            if (k != "none" && classFeatures.get(k) > thisClassCount) {
+            if (k != "none" && instanceDict.get(k) > thisClassCount) {
                 log(child.getLineNo(), "Feature Envy Found");
             }
-            System.out.println(k + ": " + classFeatures.get(k));
+            System.out.println(k + ": " + instanceDict.get(k));
         }
     }
+    
     
     /**
      * When SLIST token found, explore subtree here
      * @param child
      */
-    public String checkSLIST(DetailAST child) {
+     public String checkSLIST(DetailAST child) {
             if (child.getType() == TokenTypes.EXPR) {
                 child = child.getFirstChild();
                 if (child.getType() == TokenTypes.METHOD_CALL) {

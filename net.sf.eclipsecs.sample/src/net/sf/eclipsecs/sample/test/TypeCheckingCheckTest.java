@@ -13,8 +13,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.mockito.verification.PrivateMethodVerification;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
-//These are needed to use PowerMock/EasyMocks
-@PrepareForTest(TypeCheckingCheck.class)
+v
 public class TypeCheckingCheckTest {
 
 	@Test
