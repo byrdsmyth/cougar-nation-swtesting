@@ -13,8 +13,9 @@ import com.puppycrawl.tools.checkstyle.api.TextBlock;
  * Checks for potential locations of Spaghetti Code code smells.
  * </p>
  * <p>
- * This check looks for long classes with no structure, declaring 
- * long methods with no parameters, and utilising global variables.
+ * This check looks for long classes with no structure or inheritance, or
+ * declaring long methods with no parameters, and utilising too many 
+ * global variables.
  * </p>
  * * <ul>
  * <li>
@@ -100,8 +101,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     private int currentGlobalsCount = 0;
     
     /** Vars for local use only **/
-    private boolean TOO_MANY_GLOBALS = false;
-    private boolean INHERITANCE = false;
+    public boolean TOO_MANY_GLOBALS = false;
+    public boolean INHERITANCE = false;
 
     /**
     /* returns a set of TokenTypes which are processed in visitToken() method by default.*/
@@ -135,74 +136,107 @@ public class SpaghettiCodeCheck extends AbstractCheck {
     @Override
     public void visitToken(DetailAST ast) {
         System.out.println("token is found " + ast.getText());
+        // Set flag if inheritance found
+        checkInheritance(ast);
+        
+        // look for methods that break the rules
+        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
+            //look for long methods with no parameters
+            checkParamCount(ast);
+        }
+        // Look for long classes using the get length function
+        if (ast.getType() == TokenTypes.CLASS_DEF) {
+            // we have found a new class, so reset our inheritance flag
+            this.INHERITANCE = false;
+            System.out.println("Class found ");
+            // Again, we are starting a new class sos tart the count at 0
+            currentGlobalsCount = 0;
+            DetailAST block = ast.findFirstToken(TokenTypes.OBJBLOCK);
+            // check the length of the class and how many globals it has
+            if (block != null) {
+                checkClass(block, ast);
+            }
+        }
+    }
+    
+    public void checkInheritance(DetailAST ast) {
         // to check inheritance look for Implements and Extends
         if (ast.getType() == TokenTypes.IMPLEMENTS_CLAUSE || ast.getType() == TokenTypes.EXTENDS_CLAUSE) {
             System.out.println("Inheritance is " + this.INHERITANCE);
             this.INHERITANCE = true;
             System.out.println("Inheritance now is " + this.INHERITANCE);
         }
-        // look for methods that break the rules
-        if (ast.getType() == TokenTypes.METHOD_DEF || ast.getType() == TokenTypes.CTOR_DEF) {
-            //look for long methods with no parameters
-            int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
-            if (numberOfParameters == 0 && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
-                final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
-                if (openingBrace != null) {
-                    final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
-                    // make sure they are not too long
-                    final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    System.out.println("Method length: " + length + "Max length: " + this.maxMethodLength);
-                    if (length > maxMethodLength) {
-                        System.out.println("Method length too long: " + this.maxMethodLength);
-                        log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
-                    }
+    }
+    
+    private void checkParamCount(DetailAST ast) {
+        // Spaghetti code in part is when methods with no parameters are really long
+        // Since we found a method declaration, see if it has any parameters
+        int numberOfParameters = ast.findFirstToken(TokenTypes.PARAMETERS).getChildCount(TokenTypes.PARAMETER_DEF); // get num of parameters.
+        // if it does not have parameters, and its class has a lot of global variables
+        // then there is a high likelihood of Spaghetti Code so we investigate
+        if (numberOfParameters == 0 && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+            final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
+            // The final requirement is that the method be too long
+            // Use the pre-existing length function to check method length
+            if (openingBrace != null) {
+                final DetailAST closingBrace = openingBrace.findFirstToken(TokenTypes.RCURLY);
+                final int length = getLengthOfBlock(openingBrace, closingBrace);
+                System.out.println("Method length: " + length + "Max length: " + this.maxMethodLength);
+                if (length > maxMethodLength) {
+                    System.out.println("Method length too long: " + this.maxMethodLength);
+                    log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxMethodLength);
                 }
             }
         }
-        // Look for long classes using the get length function
-        if (ast.getType() == TokenTypes.CLASS_DEF) {
-            this.INHERITANCE = false;
-            System.out.println("Class found ");
-            currentGlobalsCount = 0;
-            DetailAST block = ast.findFirstToken(TokenTypes.OBJBLOCK);
-            // to find global variables: search for public variable at top-level of class
-            if (block != null) {
-                System.out.println("OBJBLOCK found ");
-                final DetailAST openingBrace = block.findFirstToken(TokenTypes.LCURLY);
-                if (openingBrace != null) {
-                    final DetailAST closingBrace = block.findFirstToken(TokenTypes.RCURLY);
-                    final int length = getLengthOfBlock(openingBrace, closingBrace);
-                    System.out.println("Class length: " + length + "max class length: " + this.maxClassLength);
-                    if (length > this.maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
-                        System.out.println("Class length too long: " + maxClassLength);
-                        log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
-                    }
-                }
-                // look for Var defs that are immediate children of objblock
-                DetailAST blockChild = openingBrace.getNextSibling();
-                while (blockChild != null) {
-                    if(blockChild.getType() != TokenTypes.VARIABLE_DEF) {
-                        blockChild = blockChild.getNextSibling();
-                    }
-                    else {
-                        DetailAST childType = blockChild.findFirstToken(TokenTypes.MODIFIERS);
-                        if(childType.getFirstChild() != null) {
-                            if (childType.getFirstChild().getType() == TokenTypes.LITERAL_PUBLIC) {
-                                this.currentGlobalsCount++;
-                                System.out.println("found public var: " + this.currentGlobalsCount);
-                                if (this.currentGlobalsCount > maxGlobalVars && this.INHERITANCE == false) {
-                                    System.out.println("found too many public var: " + this.currentGlobalsCount);
-                                    this.TOO_MANY_GLOBALS = true;
-                                }
-                            }
-                        }
-                    }
-                    if(blockChild != null && blockChild.getNextSibling() != null) {
-                        blockChild = blockChild.getNextSibling();
-                    }
-                    else {
-                        blockChild = null;
-                    }
+    }
+    
+    private void checkClass(DetailAST block, DetailAST ast) {
+        // check the length of the class first
+        System.out.println("OBJBLOCK found ");
+        // Need opening and closing tokens for the class
+        final DetailAST openingBrace = block.findFirstToken(TokenTypes.LCURLY);
+        if (openingBrace != null) {
+            // Use the pre-existing length function to check class length
+            final DetailAST closingBrace = block.findFirstToken(TokenTypes.RCURLY);
+            final int length = getLengthOfBlock(openingBrace, closingBrace);
+            System.out.println("Class length: " + length + "max class length: " + this.maxClassLength);
+            if (length > this.maxClassLength && this.INHERITANCE == false && this.TOO_MANY_GLOBALS == true) {
+                System.out.println("Class length too long: " + maxClassLength);
+                log(ast.getLineNo(), "potential spaghetti code with long methods or too many globals", maxClassLength);
+            }
+        }
+        // to find global variables: search for public variable at top-level of class
+        // look for Var defs that are immediate children of objblock
+        DetailAST blockChild = openingBrace.getNextSibling();
+        while (blockChild != null) {
+            // Find the variable definitions
+            if(blockChild.getType() != TokenTypes.VARIABLE_DEF) {
+                blockChild = blockChild.getNextSibling();
+            }
+            else {
+                checkModifiers(blockChild);
+            }
+            if(blockChild != null && blockChild.getNextSibling() != null) {
+                blockChild = blockChild.getNextSibling();
+            }
+            else {
+                blockChild = null;
+            }
+        }
+    }
+    
+    private void checkModifiers(DetailAST blockChild) {
+     // Then check the variable's modifiers
+        DetailAST childType = blockChild.findFirstToken(TokenTypes.MODIFIERS);
+        if(childType.getFirstChild() != null) {
+            // if we find a variable outside a method that is public
+            // count it as a global variable instance
+            if (childType.getFirstChild().getType() == TokenTypes.LITERAL_PUBLIC) {
+                this.currentGlobalsCount++;
+                System.out.println("found public var: " + this.currentGlobalsCount);
+                if (this.currentGlobalsCount > maxGlobalVars && this.INHERITANCE == false) {
+                    System.out.println("found too many public var: " + this.currentGlobalsCount);
+                    this.TOO_MANY_GLOBALS = true;
                 }
             }
         }
@@ -216,9 +250,8 @@ public class SpaghettiCodeCheck extends AbstractCheck {
      * @return number of lines with code for current block
      * Code for calculating length from getMethodLengthCHeck on checkstyle's github page
      */
-    private int getLengthOfBlock(DetailAST openingBrace, DetailAST closingBrace) {
+    public int getLengthOfBlock(DetailAST openingBrace, DetailAST closingBrace) {
         int length = closingBrace.getLineNo() - openingBrace.getLineNo() + 1;
-
 //        if (!countEmpty) {
 //            final FileContents contents = getFileContents();
 //            final int lastLine = closingBrace.getLineNo();

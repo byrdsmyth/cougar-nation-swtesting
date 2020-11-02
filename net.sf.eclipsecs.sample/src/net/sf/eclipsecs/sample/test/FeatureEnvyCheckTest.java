@@ -1,8 +1,5 @@
 package net.sf.eclipsecs.sample.test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -19,9 +16,13 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
+
 import static org.junit.Assert.*;
 import org.junit.Test;
-
+import java.lang.reflect.Method; 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor; 
 import antlr.CommonHiddenStreamToken;
 
 import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
@@ -287,7 +288,7 @@ public class FeatureEnvyCheckTest {
     }
     
     @Test
-    public void testCountInstances() {
+    public void testCountInstances() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         DetailAST childAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
         //let's create an empty dictionary
         Dictionary<String, Integer> tempDict = new Hashtable<>();
@@ -299,10 +300,15 @@ public class FeatureEnvyCheckTest {
         // we need to mock up getLineNumber
         //doReturn(100).when(childAST).getLineNo();
         // and probably mock up log()
-        doReturn("feature envy found").when(spyTester).log(100, "feature envy found");
+        //doReturn("feature envy found").when(spyTester).log(100, "feature envy found");
         
         // and see if we get to the log, so call fxn
-        spyTester.countInstances(tempDict, childAST);
+        Method countInstancesMethod
+        = FeatureEnvyCheck.class.getDeclaredMethod("countInstances", Hashtable.class, DetailAST.class);
+   
+        FeatureEnvyCheck operationsInstance = new FeatureEnvyCheck();
+        Double result = (Double) countInstancesMethod.invoke(operationsInstance, tempDict, childAST);
+    
         // now add two more ref to this
         tempDict.put("this", 2);
         // and call fxn again

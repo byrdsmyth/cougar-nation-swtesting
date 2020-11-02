@@ -25,6 +25,8 @@ import com.puppycrawl.tools.checkstyle.filters.SuppressWithNearbyCommentFilter;
 import com.puppycrawl.tools.checkstyle.filters.SuppressionCommentFilter;
 import com.puppycrawl.tools.checkstyle.filters.SuppressionXpathFilter;
 
+import antlr.CommonHiddenStreamToken;
+
 import java.util.ArrayList;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -53,7 +55,7 @@ import static org.junit.Assert.*;
 //These are needed to use PowerMock/EasyMocks
 @PrepareForTest(SpaghettiCodeCheck.class)
 public class SpaghettiCheckTest {
-    
+
     public DetailAST tree;
     public SpaghettiCodeCheck tester;
     public SpaghettiCodeCheck mockTester;
@@ -63,54 +65,51 @@ public class SpaghettiCheckTest {
     public int[] unacceptableTokens;
     public int[] requiredTokens;
     ArrayList<Integer> tokenArr;
-    
-    /** 
-     * Set up a mock instance of the Spaghetti Code Checker
-     * Including the acceptable and required tokens, 
-     * saved to arrays
+
+    /**
+     * Set up a mock instance of the Spaghetti Code Checker Including the acceptable
+     * and required tokens, saved to arrays
      */
     @Before
     public void setUp() throws Exception {
-      acceptableTokens = new int[0];
-      defaultTokens = new int[] {TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
-              TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF};
-      unacceptableTokens = new int[] { TokenTypes.ABSTRACT, TokenTypes.ANNOTATION, TokenTypes.ANNOTATION_ARRAY_INIT, 
-              TokenTypes.ANNOTATION_DEF,TokenTypes.ANNOTATION_FIELD_DEF,TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR,
-              TokenTypes.ANNOTATIONS, TokenTypes.ARRAY_DECLARATOR, TokenTypes.ARRAY_INIT, TokenTypes.ASSIGN, 
-              TokenTypes.AT };
-      requiredTokens = new int[0];
-      
-      tree = new DetailAST();
-      
-      // What is this?
-      //tree.setLineNo(42);
-     
-      tester = new SpaghettiCodeCheck();
-      mockTester = mock(SpaghettiCodeCheck.class);
-      spyTester = spy(tester);  
-      
-      tokenArr = new ArrayList<Integer>();
-      tokenArr.add(TokenTypes.METHOD_DEF);
-      tokenArr.add(TokenTypes.CTOR_DEF);
-      tokenArr.add(TokenTypes.IMPLEMENTS_CLAUSE);
-      tokenArr.add(TokenTypes.EXTENDS_CLAUSE);
-      tokenArr.add(TokenTypes.CLASS_DEF);
+        acceptableTokens = new int[0];
+        defaultTokens = new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE,
+                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF };
+        unacceptableTokens = new int[] { TokenTypes.ABSTRACT, TokenTypes.ANNOTATION, TokenTypes.ANNOTATION_ARRAY_INIT,
+                TokenTypes.ANNOTATION_DEF, TokenTypes.ANNOTATION_FIELD_DEF, TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR,
+                TokenTypes.ANNOTATIONS, TokenTypes.ARRAY_DECLARATOR, TokenTypes.ARRAY_INIT, TokenTypes.ASSIGN,
+                TokenTypes.AT };
+        requiredTokens = new int[0];
+
+        tree = new DetailAST();
+
+        // What is this?
+        // tree.setLineNo(42);
+
+        tester = new SpaghettiCodeCheck();
+        mockTester = mock(SpaghettiCodeCheck.class);
+        spyTester = spy(tester);
+
+        tokenArr = new ArrayList<Integer>();
+        tokenArr.add(TokenTypes.METHOD_DEF);
+        tokenArr.add(TokenTypes.CTOR_DEF);
+        tokenArr.add(TokenTypes.IMPLEMENTS_CLAUSE);
+        tokenArr.add(TokenTypes.EXTENDS_CLAUSE);
+        tokenArr.add(TokenTypes.CLASS_DEF);
     }
 
-    
-    /** 
-     * This section contains basic unit tests for the 
-     * getters and setters outside of the default ones
-     * in the AbstractCheck Class
+    /**
+     * This section contains basic unit tests for the getters and setters outside of
+     * the default ones in the AbstractCheck Class
      */
     @Test
     public void testSetMaxGlobalVars() {
         SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck();
         sCheck.setMaxGlobalVars(3);
         assertEquals(3, sCheck.getMaxGlobalVars());
-        //assertNotEquals(2, sCheck.getMaxGlobalVars());
+        // assertNotEquals(2, sCheck.getMaxGlobalVars());
     }
-    
+
     @Test
     public void testSetMaxClassLength() {
         SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck();
@@ -118,7 +117,7 @@ public class SpaghettiCheckTest {
         assertEquals(3, sCheck.getMaxClassLength());
         assertNotEquals(2, sCheck.getMaxClassLength());
     }
-    
+
     @Test
     public void testSetMaxLines() {
         SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck();
@@ -126,153 +125,182 @@ public class SpaghettiCheckTest {
         assertEquals(3, sCheck.getMaxLines());
         assertNotEquals(2, sCheck.getMaxLines());
     }
-    
-    /** 
-     * This section contains basic unit tests for the 
-     * getters and setters in the AbstractCheck Class
+
+    /**
+     * This section contains basic unit tests for the getters and setters in the
+     * AbstractCheck Class
      */
     @Test
     public void testGetDefaultTokens() {
-      assertArrayEquals(defaultTokens, spyTester.getDefaultTokens());
-      verify(spyTester, times(1)).getDefaultTokens();
+        assertArrayEquals(defaultTokens, spyTester.getDefaultTokens());
+        verify(spyTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetNotDefaultTokens() {
-      assertNotEquals(unacceptableTokens, spyTester.getDefaultTokens());
-      verify(spyTester, times(1)).getDefaultTokens();
+        assertNotEquals(unacceptableTokens, spyTester.getDefaultTokens());
+        verify(spyTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetNullDefaultTokens() {
-      assertNotEquals(null, spyTester.getDefaultTokens());
-      verify(spyTester, times(1)).getDefaultTokens();
+        assertNotEquals(null, spyTester.getDefaultTokens());
+        verify(spyTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetDefaultTokensMock() {
-      when(mockTester.getDefaultTokens())
-        .thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
-                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
-      assertArrayEquals(defaultTokens, mockTester.getDefaultTokens());
-      verify(mockTester, times(1)).getDefaultTokens();
+        when(mockTester.getDefaultTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF,
+                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
+        assertArrayEquals(defaultTokens, mockTester.getDefaultTokens());
+        verify(mockTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetNotDefaultTokensMock() {
-      when(mockTester.getDefaultTokens())
-        .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
-      assertNotEquals(unacceptableTokens, mockTester.getDefaultTokens());
-      verify(mockTester, times(1)).getDefaultTokens();
+        when(mockTester.getDefaultTokens())
+                .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
+        assertNotEquals(unacceptableTokens, mockTester.getDefaultTokens());
+        verify(mockTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetNullDefaultTokensMock() {
-      when(mockTester.getDefaultTokens())
-        .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
-      assertNotEquals(null, mockTester.getDefaultTokens());
-      verify(mockTester, times(1)).getDefaultTokens();
+        when(mockTester.getDefaultTokens())
+                .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
+        assertNotEquals(null, mockTester.getDefaultTokens());
+        verify(mockTester, times(1)).getDefaultTokens();
     }
-    
+
     @Test
     public void testGetRequiredTokens() {
-      assertArrayEquals(requiredTokens, spyTester.getRequiredTokens());
-      verify(spyTester, times(1)).getRequiredTokens();
+        assertArrayEquals(requiredTokens, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetUnrequiredTokens() {
-      assertNotEquals(unacceptableTokens, spyTester.getRequiredTokens());
-      verify(spyTester, times(1)).getRequiredTokens();
+        assertNotEquals(unacceptableTokens, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetNullRequiredTokens() {
-      assertNotEquals(null, spyTester.getRequiredTokens());
-      verify(spyTester, times(1)).getRequiredTokens();
+        assertNotEquals(null, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetRequiredTokensMock() {
-      when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-      assertArrayEquals(requiredTokens, mockTester.getRequiredTokens());
-      verify(mockTester, times(1)).getRequiredTokens();
+        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
+        assertArrayEquals(requiredTokens, mockTester.getRequiredTokens());
+        verify(mockTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetUnrequiredTokensMock() {
-      when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-      assertNotEquals(unacceptableTokens, mockTester.getRequiredTokens());
-      verify(mockTester, times(1)).getRequiredTokens();
+        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
+        assertNotEquals(unacceptableTokens, mockTester.getRequiredTokens());
+        verify(mockTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetNullRequiredTokensMock() {
-      when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-      assertNotEquals(null, mockTester.getRequiredTokens());
-      verify(mockTester, times(1)).getRequiredTokens();
+        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
+        assertNotEquals(null, mockTester.getRequiredTokens());
+        verify(mockTester, times(1)).getRequiredTokens();
     }
-    
+
     @Test
     public void testGetAcceptableTokens() {
-      assertArrayEquals(acceptableTokens, spyTester.getAcceptableTokens());
-      verify(spyTester, times(1)).getAcceptableTokens();
+        assertArrayEquals(acceptableTokens, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
     }
-    
+
     @Test
     public void testGetUnacceptableTokens() {
-      assertNotEquals(unacceptableTokens, spyTester.getAcceptableTokens());
-      verify(spyTester, times(1)).getAcceptableTokens();
+        assertNotEquals(unacceptableTokens, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
     }
-    
+
     @Test
     public void testGetNullAcceptableTokens() {
-      assertNotEquals(null, spyTester.getAcceptableTokens());
-      verify(spyTester, times(1)).getAcceptableTokens();
+        assertNotEquals(null, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
     }
-    
+
     @Test
     public void testGetAcceptableTokensMock() {
-      when(mockTester.getAcceptableTokens())
-         .thenReturn(new int[0]);
-      assertArrayEquals(acceptableTokens, mockTester.getAcceptableTokens());
-      verify(mockTester, times(1)).getAcceptableTokens();
+        when(mockTester.getAcceptableTokens()).thenReturn(new int[0]);
+        assertArrayEquals(acceptableTokens, mockTester.getAcceptableTokens());
+        verify(mockTester, times(1)).getAcceptableTokens();
     }
-    
+
     @Test
     public void testGetUnacceptableTokensMock() {
-      when(mockTester.getAcceptableTokens())
-        .thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
-                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
-      assertNotEquals(unacceptableTokens, mockTester.getAcceptableTokens());
-      verify(mockTester, times(1)).getAcceptableTokens();
+        when(mockTester.getAcceptableTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF,
+                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
+        assertNotEquals(unacceptableTokens, mockTester.getAcceptableTokens());
+        verify(mockTester, times(1)).getAcceptableTokens();
     }
-    
+
     @Test
     public void testGetNullAcceptableTokensMock() {
-      when(mockTester.getAcceptableTokens())
-        .thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF, TokenTypes.IMPLEMENTS_CLAUSE, 
-                TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
-      assertNotEquals(null, mockTester.getAcceptableTokens());
-      verify(mockTester, times(1)).getAcceptableTokens();
+        when(mockTester.getAcceptableTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF,
+                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
+        assertNotEquals(null, mockTester.getAcceptableTokens());
+        verify(mockTester, times(1)).getAcceptableTokens();
     }
-    
+
+    @Test
+    public void checkInheritance() {
+        SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck();
+        DetailAST ast = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        sCheck.checkInheritance(ast);
+        assertFalse(sCheck.INHERITANCE);
+        
+    }
+
     @Test
     public void testGetLengthOfBlock() {
-        SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck(); 
+        SpaghettiCodeCheck sCheck = new SpaghettiCodeCheck();
         DetailAST astOpeningBrace = new DetailAST();
         DetailAST astClosingBrace = new DetailAST();
         astOpeningBrace.setType(TokenTypes.LCURLY);
         astOpeningBrace.setType(TokenTypes.RCURLY);
-        astOpeningBrace.addChild(new DetailAST());
-        astOpeningBrace.addChild(new DetailAST());
-        astOpeningBrace.addChild(new DetailAST());
-        astOpeningBrace.addChild(new DetailAST());
-        
-//        ReflectionTestUtils.setField(sCheck, "switches", 1);
-//        ReflectionTestUtils.invokeMethod(sCheck,"getLengthOfBlock", astOpeningBraces);   
+        assertEquals(1, sCheck.getLengthOfBlock(astOpeningBrace, astClosingBrace));
+        assertNotEquals(0, sCheck.getLengthOfBlock(astOpeningBrace, astClosingBrace));
+        assertNotEquals(2, sCheck.getLengthOfBlock(astOpeningBrace, astClosingBrace));
     }
 
+/////////// mocking method from test
+    /**
+     * A function borrowed from github user Ivanov-Alex:
+     * https://gist.github.com/ivanov-alex/e0cc14d3dc6fc1520283 Creates MOCK lexical
+     * token and returns AST node for this token From Wikipedia: ANTLR can generate
+     * lexers, parsers, tree parsers, and combined lexer-parsers. Parsers can
+     * automatically generate parse trees or abstract syntax trees, which can be
+     * further processed with tree parsers.
+     * 
+     * @param tokenType     type of token
+     * @param tokenText     text of token
+     * @param tokenFileName file name of token
+     * @param tokenRow      token position in a file (row)
+     * @param tokenColumn   token position in a file (column)
+     * @return AST node for the token
+     */
+    private static DetailAST mockAST(final int tokenType, final String tokenText, final String tokenFileName,
+            final int tokenRow, final int tokenColumn) {
+        CommonHiddenStreamToken tokenImportSemi = new CommonHiddenStreamToken();
+        tokenImportSemi.setType(tokenType);
+        tokenImportSemi.setText(tokenText);
+        tokenImportSemi.setLine(tokenRow);
+        tokenImportSemi.setColumn(tokenColumn);
+        tokenImportSemi.setFilename(tokenFileName);
+        DetailAST astSemi = new DetailAST();
+        astSemi.initialize(tokenImportSemi);
+        return astSemi;
+    }
 
     /*
      * @Test public void avoidOnlyRelationalOperandsInCondition() throws Exception {
