@@ -6,6 +6,7 @@ Davis, Britt
 
 Njuguna, Jesse W
 
+<<<<<<< HEAD
 Steps....
  TO TEST THE CUSTOM CHECKS:
  
@@ -32,7 +33,6 @@ Steps....
   21. You should now see the Checkstyle error for our custom checks
 
 SETUP STEPS FOR USING GITHUB:
->>>>>>> 2c754c57fdf1346e52e449906e6ffbb9e7c387f0
 First Time:
 1)git config -global user.name "username"
 2)git config -global user.email "email"
