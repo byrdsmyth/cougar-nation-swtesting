@@ -31,7 +31,7 @@ interface SixInterface
 }
 
 public class SwissArmyTest implements OneInterface, TwoInterface, ThreeInterface, 
-	FourInterface, FiveInterface, SixInterface {
+	FourInterface, FiveInterface {
     public static void main(String... args) {
 
     }
@@ -56,12 +56,6 @@ public class SwissArmyTest implements OneInterface, TwoInterface, ThreeInterface
 
 	@Override
 	public float m4() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float m6() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

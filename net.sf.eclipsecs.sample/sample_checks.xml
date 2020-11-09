@@ -8,9 +8,9 @@
     <module name="Header">
         <property name="headerFile" value="${config_loc}/java.header" />
     </module>
+    
 
     <module name="TreeWalker">
-
         <module name="MethodLimit">
             <property name="max" value="1" />
             <message key="methodlimit" value="Man, only {0} methods allowed." />
@@ -26,3 +26,4 @@
         </module>
     </module>
 </module>
+

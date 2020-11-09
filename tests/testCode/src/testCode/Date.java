@@ -1,21 +1,17 @@
 package testCode;
 
-import java.util.logging.Logger;
-import java.time.Month;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class Date {
 	
 	/**Logger for debugging*/
-	private Logger logger = Logger.getLogger("Date Logger");
 
 	private int mm;
 	private int dd;
 	private int yyyy;
-	private int dayNumber;
-	private String dayName;
-	private String zodiacSign;
+	private int dayNumber=0;
+	private String dayName = "";
+	private String zodiacSign = "";
 	private String isLeap = null;
 	int days[] = { 31, 28, 31, 30, 31, 30, 
             31, 31, 30, 31, 30, 31 }; 
@@ -45,29 +41,13 @@ public class Date {
 			System.out.println("Cannot initalize attributes since a dd, mm, or yyyy is invalid");
 		}
 		
-		Object obj = validRangeForDay(dd);
-		int a = 0;
-		int b = 0;
-		int c = 0;
-		int d = 0;
-		if(obj instanceof Boolean) {
-			//Trying a checkstyle
-		}
-		
-		switch(a) {
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		}
-		
-		if(a == 0 || a <= 1 || b >= 2 && c == 6 && d != 0 || a == 7 && a == 9) {
+		if(dayName instanceof String) {
+			
+		} else if(dayName instanceof Object) {
 			
 		}
 	}
-
+	
 	// Returns the date in the following format:
 	// <dayName>, <mm>/<dd>/<yyyy>, is the <dayNumber> of the year and the zodiac sign is <zodiacSign>
 	public String toString(){
@@ -78,10 +58,6 @@ public class Date {
 	public void setMonthAndDay(int month, int day) {
 		this.mm = month;
 		this.dd = day;
-	}
-	
-	public String isLeapString() {
-		return isLeap;
 	}
 
 	// Returns the zodiac sign 
@@ -111,7 +87,7 @@ public class Date {
 		else if ((getMm() == 11 && getDd() >= 22 && getDd() <= 30) || (getMm() == 12 && getDd() >= 1 && getDd() <= 21))
 			return "Sagittarius";
 		else
-			return null;
+			return "";
 	}
 
 
@@ -169,7 +145,7 @@ public class Date {
 		}
 		return true;
 	}
-
+	
 	// Returns true if the combination of the parameters is valid 
 	public static boolean isValidDate(int thisDay,int thisMonth,int thisYear){
 		System.out.println("Entering isValid");
@@ -192,7 +168,7 @@ public class Date {
 		//while the year 1900 is not a leap year
 		public static boolean isLeap(int year)
 		{
-			if( (year%4==0) && (year%100!=0) || (year%400==0)){
+			if( ((year%4==0) && (year%100!=0)) || (year%400==0)){
 				return true;
 			}
 			return false;
@@ -288,7 +264,7 @@ public class Date {
 	}
 
 	// TODO: for Jan 1, 2017 it should return Sunday; for Jan 2, 2017 it should return Monday etc.
-	public  String dateToDayName(){
+	public String dateToDayName(){
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.DAY_OF_MONTH, dd);
 		cal.set(Calendar.MONTH,mm);
@@ -322,5 +298,5 @@ public class Date {
 		}
 		return dayName;
 	}
-
+	
 }
