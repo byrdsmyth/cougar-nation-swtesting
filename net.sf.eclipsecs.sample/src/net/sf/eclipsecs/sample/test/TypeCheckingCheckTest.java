@@ -2,6 +2,8 @@ package net.sf.eclipsecs.sample.test;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
+
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -71,13 +73,8 @@ public class TypeCheckingCheckTest {
 	public void testGetRequiredTokens() {
 		TypeCheckingCheck tc = new TypeCheckingCheck();
 		assertEquals(tc.getRequiredTokens().length, 0);
-		
-		if(tc.getRequiredTokens().length > 0 || tc.getRequiredTokens().length < 0) {
-			assertTrue(false);
-		} else {
-			assertFalse(false);
-		}
-		
+		assertNotEquals(tc.getRequiredTokens().length, -1);
+		assertNotEquals(tc.getRequiredTokens().length, 1);
 	}
 	
 	@Test
@@ -140,6 +137,12 @@ public class TypeCheckingCheckTest {
 		TypeCheckingCheck tc = new TypeCheckingCheck();	
 		tc.setMaxCases(3);
 		DetailAST ast = new DetailAST();
+		ast.setType(TokenTypes.LITERAL_IF);
+		
+		ReflectionTestUtils.setField(tc, "cases", 1);
+		ReflectionTestUtils.invokeMethod(tc,"checkForCasesInSwitch", ast);
+		
+		ast = new DetailAST();
 		ast.setType(TokenTypes.LITERAL_SWITCH);
 		
 		ReflectionTestUtils.setField(tc, "cases", 1);
@@ -149,9 +152,13 @@ public class TypeCheckingCheckTest {
 	
 	@Test
 	public void testVisitToken() {
-		TypeCheckingCheck tc = PowerMockito.spy(new TypeCheckingCheck());	
+		TypeCheckingCheck tc = PowerMockito.spy(new TypeCheckingCheck());
+		
 		DetailAST ast = new DetailAST();
 		ast.setType(TokenTypes.LITERAL_IF);
+		ReflectionTestUtils.setField(tc, "values", "(test string;", String.class);
+		ReflectionTestUtils.invokeMethod(tc,"checkForLongLogic", ast);
+		
 		tc.visitToken(ast);
 		
 		try {
@@ -160,6 +167,7 @@ public class TypeCheckingCheckTest {
 			privateMethodInvocation.invoke("checkForSwitchStatements", ast);
 			privateMethodInvocation.invoke("checkForInstances", ast);
 			privateMethodInvocation.invoke("checkForLongLogic", ast);
+			privateMethodInvocation.invoke("checkForCasesInSwitch", ast);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
@@ -167,7 +175,7 @@ public class TypeCheckingCheckTest {
 	
 	@Test
 	public void testCheckForInstances() {
-		TypeCheckingCheck tc = new TypeCheckingCheck();	
+		TypeCheckingCheck tc = PowerMockito.spy(new TypeCheckingCheck());
 		tc.setMaxInstanceOf(3);
 		
 		DetailAST ast = new DetailAST();
@@ -252,5 +260,25 @@ public class TypeCheckingCheckTest {
 		ast.addChild(lastChild);
 		ReflectionTestUtils.setField(tc, "instances", 1);
 		ReflectionTestUtils.invokeMethod(tc,"checkForInstances", ast);
+	}
+	
+	@Test
+	public void testCheckForLongLogic() {
+		TypeCheckingCheck tc = PowerMockito.spy(new TypeCheckingCheck());	
+		DetailAST ast = new DetailAST();
+		ast.setType(TokenTypes.LITERAL_IF);
+		
+		ReflectionTestUtils.setField(tc, "values", "(test string;", String.class);
+		ReflectionTestUtils.invokeMethod(tc,"checkForLongLogic", ast);
+		
+		ReflectionTestUtils.setField(tc, "values", "(test string");
+		ReflectionTestUtils.invokeMethod(tc,"checkForLongLogic", ast);
+		
+		ReflectionTestUtils.setField(tc, "values", "test string;");
+		ReflectionTestUtils.invokeMethod(tc,"checkForLongLogic", ast);
+		
+		ReflectionTestUtils.setField(tc, "values", "null");
+		ReflectionTestUtils.invokeMethod(tc,"checkForLongLogic", ast);
+		
 	}
 }

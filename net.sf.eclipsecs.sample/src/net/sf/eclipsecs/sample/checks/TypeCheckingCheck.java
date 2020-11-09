@@ -1,10 +1,6 @@
 
 package net.sf.eclipsecs.sample.checks;
 
-import static org.mockito.Matchers.intThat;
-
-import org.springframework.util.StringUtils;
-
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -29,6 +25,8 @@ public class TypeCheckingCheck extends AbstractCheck{
       private int switches = 0;
       
       private int cases = 0;
+      
+      private String values=null;
       
       public void setMaxInstanceOf(int i) {
     	  max_instances = i;
@@ -106,7 +104,7 @@ public class TypeCheckingCheck extends AbstractCheck{
 		  if(ast.getType() == TokenTypes.LITERAL_SWITCH) {
 			  switches++;
 			  if(switches >= max_switches) {
-				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches");
+				  log(ast.getLineNo(), "Type Check violation detected:  Too many switches: ");
 			  }
 		  }
 	  }
@@ -148,15 +146,16 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForLongLogic(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.LITERAL_IF) {
-			  String values = ast.toStringTree();
+			  System.out.println(values);
+			  if(!ast.toStringTree().contains("null")) {
+				  values = ast.toStringTree();
+			  }
 			  if(values.indexOf("(") != -1 && values.indexOf(";") != -1) {
 				  String substring =  values.substring(values.indexOf("(") + 1, values.indexOf(";"));
 				  int countOr, countAnd, total = 0;
 				  countAnd = count(substring, "&&");
 				  countOr = count(substring, "||");
 				  total = countOr + countAnd;
-				  System.out.println(total);
-				  System.out.println(substring);
 				  if(total >= max_and_ors) {
 					  log(ast.getLineNo(), "Type Check violation detected: Too many logical operations per line");
 				  }

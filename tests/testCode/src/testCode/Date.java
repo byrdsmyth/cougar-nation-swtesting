@@ -1,4 +1,4 @@
-package com.wsu;
+package testCode;
 
 import java.util.Calendar;
 
@@ -264,7 +264,7 @@ public class Date {
 	}
 
 	// TODO: for Jan 1, 2017 it should return Sunday; for Jan 2, 2017 it should return Monday etc.
-	public  String dateToDayName(){
+	public String dateToDayName(){
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.DAY_OF_MONTH, dd);
 		cal.set(Calendar.MONTH,mm);
