@@ -13,7 +13,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.mockito.verification.PrivateMethodVerification;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
-v
 public class TypeCheckingCheckTest {
 
 	@Test

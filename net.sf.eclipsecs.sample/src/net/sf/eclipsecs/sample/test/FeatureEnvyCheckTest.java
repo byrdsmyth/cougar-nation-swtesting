@@ -90,7 +90,7 @@ public class FeatureEnvyCheckTest {
 
     /**
      * Set up a mock instance of the Spaghetti Code Checker Including the acceptable
-     * and required tokens, saved to arrays
+     * and required tokens, saved to arrays, to use in tests
      */
     @Before
     public void setUp() throws Exception {
@@ -114,149 +114,33 @@ public class FeatureEnvyCheckTest {
         tokenArr = new ArrayList<Integer>();
         tokenArr.add(TokenTypes.METHOD_DEF);
     }
-
+    
     /**
-     * This section contains basic unit tests for the getters and setters in the
-     * AbstractCheck Class
+     * This section contains tests of the generic function visitToken
      */
     @Test
-    public void testGetDefaultTokens() {
-        assertArrayEquals(defaultTokens, spyTester.getDefaultTokens());
-        verify(spyTester, times(1)).getDefaultTokens();
-    }
+    public void testVisitToken() {
+        DetailAST parentAST = mockAST(TokenTypes.METHOD_DEF, "parent", null, 0, 0);
+        DetailAST childAST = mockAST(TokenTypes.METHOD_DEF, "child", null, 0, 0);
+        DetailAST siblingAST = mockAST(TokenTypes.METHOD_DEF, "sibling", null, 0, 0);
+        DetailAST sibling2AST = mockAST(TokenTypes.METHOD_DEF, "sibling", null, 0, 0);
 
-    @Test
-    public void testGetNotDefaultTokens() {
-        assertNotEquals(unacceptableTokens, spyTester.getDefaultTokens());
-        verify(spyTester, times(1)).getDefaultTokens();
+        parentAST.addChild(childAST);
+        parentAST.addChild(siblingAST);
+        parentAST.addChild(sibling2AST);
+         
+        spyTester.visitToken(parentAST);
     }
-
-    @Test
-    public void testGetNullDefaultTokens() {
-        assertNotEquals(null, spyTester.getDefaultTokens());
-        verify(spyTester, times(1)).getDefaultTokens();
-    }
-
-    @Test
-    public void testGetDefaultTokensMock() {
-        when(mockTester.getDefaultTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF });
-        assertArrayEquals(defaultTokens, mockTester.getDefaultTokens());
-        verify(mockTester, times(1)).getDefaultTokens();
-    }
-
-    @Test
-    public void testGetNotDefaultTokensMock() {
-        when(mockTester.getDefaultTokens())
-                .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
-        assertNotEquals(unacceptableTokens, mockTester.getDefaultTokens());
-        verify(mockTester, times(1)).getDefaultTokens();
-    }
-
-    @Test
-    public void testGetNullDefaultTokensMock() {
-        when(mockTester.getDefaultTokens())
-                .thenReturn(new int[] { TokenTypes.SINGLE_LINE_COMMENT, TokenTypes.BLOCK_COMMENT_BEGIN });
-        assertNotEquals(null, mockTester.getDefaultTokens());
-        verify(mockTester, times(1)).getDefaultTokens();
-    }
-
-    @Test
-    public void testGetRequiredTokens() {
-        assertArrayEquals(requiredTokens, spyTester.getRequiredTokens());
-        verify(spyTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetUnrequiredTokens() {
-        assertNotEquals(unacceptableTokens, spyTester.getRequiredTokens());
-        verify(spyTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetNullRequiredTokens() {
-        assertNotEquals(null, spyTester.getRequiredTokens());
-        verify(spyTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetRequiredTokensMock() {
-        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-        assertArrayEquals(requiredTokens, mockTester.getRequiredTokens());
-        verify(mockTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetUnrequiredTokensMock() {
-        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-        assertNotEquals(unacceptableTokens, mockTester.getRequiredTokens());
-        verify(mockTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetNullRequiredTokensMock() {
-        when(mockTester.getRequiredTokens()).thenReturn(new int[0]);
-        assertNotEquals(null, mockTester.getRequiredTokens());
-        verify(mockTester, times(1)).getRequiredTokens();
-    }
-
-    @Test
-    public void testGetAcceptableTokens() {
-        assertArrayEquals(acceptableTokens, spyTester.getAcceptableTokens());
-        verify(spyTester, times(1)).getAcceptableTokens();
-    }
-
-    @Test
-    public void testGetUnacceptableTokens() {
-        assertNotEquals(unacceptableTokens, spyTester.getAcceptableTokens());
-        verify(spyTester, times(1)).getAcceptableTokens();
-    }
-
-    @Test
-    public void testGetNullAcceptableTokens() {
-        assertNotEquals(null, spyTester.getAcceptableTokens());
-        verify(spyTester, times(1)).getAcceptableTokens();
-    }
-
-    @Test
-    public void testGetAcceptableTokensMock() {
-        when(mockTester.getAcceptableTokens()).thenReturn(new int[0]);
-        assertArrayEquals(acceptableTokens, mockTester.getAcceptableTokens());
-        verify(mockTester, times(1)).getAcceptableTokens();
-    }
-
-    @Test
-    public void testGetUnacceptableTokensMock() {
-        when(mockTester.getAcceptableTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF,
-                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
-        assertNotEquals(unacceptableTokens, mockTester.getAcceptableTokens());
-        verify(mockTester, times(1)).getAcceptableTokens();
-    }
-
-    @Test
-    public void testGetNullAcceptableTokensMock() {
-        when(mockTester.getAcceptableTokens()).thenReturn(new int[] { TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF,
-                TokenTypes.IMPLEMENTS_CLAUSE, TokenTypes.EXTENDS_CLAUSE, TokenTypes.CLASS_DEF });
-        assertNotEquals(null, mockTester.getAcceptableTokens());
-        verify(mockTester, times(1)).getAcceptableTokens();
-    }
-
+    
     /**
      * This section contains tests of the more custom functions, specific to this
      * particular check
      */
-    @Test
-    public void testVisitToken() {
-        //testGetChildCount()
-        // Need to mock a call to checkSiblings - replace later
-        // for integration testing
-        PowerMock.mockStaticPartial(FeatureEnvyCheck.class, "checkSiblings");
-        EasyMock.expect(FeatureEnvyCheck.checkSiblings(mockAST, 3)).andReturn();
-        PowerMock.replayAll();
-        assertFalse(Date.visitToken(29,02,2017));
-        assertTrue(Date.visitToken(31,01,2017));
-        assertFalse(Date.visitToken(31,06,2017));
-    }
     
+    /*
+     * Tests the function which counts a node's children
+     * by asserting a value gets returned
+     */
     @Test
     public void testGetChildCount() {
         FeatureEnvyCheck fe = new FeatureEnvyCheck();
@@ -267,133 +151,413 @@ public class FeatureEnvyCheckTest {
         assertEquals(3,methodAST.getChildCount());
     }
     
+    /*
+     * Tests the checkSiblings function when countInstances returns false
+     */
     @Test
-    public void testCheckSiblings() {
-        FeatureEnvyCheck fe = new FeatureEnvyCheck();
-        DetailAST methodAST = mockAST(TokenTypes.METHOD_DEF, null, null, 0, 0);
-        // Need to mock a call to countInstances
-        Dictionary<String, Integer> classFeatures = new Hashtable<>();
-        classFeatures.put("none", 1);
+    public void testCheckSiblings1() {
+        //As described in deliverable, this set of nodes acts as a mock-up
+        // of a part of an actual parse tree from the treewalker GUI
+        DetailAST parent = mockAST(TokenTypes.METHOD_DEF, "parent", null, 0, 0);
+        DetailAST child1 = mockAST(TokenTypes.MODIFIERS, "MODIFIERS", null, 0, 0);
+        DetailAST child2 = mockAST(TokenTypes.TYPE, "TYPE", null, 0, 0);
+        DetailAST child3 = mockAST(TokenTypes.IDENT, "FE_This", null, 0, 0);
+        DetailAST child4 = mockAST(TokenTypes.LPAREN, "(", null, 0, 0);
+        DetailAST child5 = mockAST(TokenTypes.PARAMETERS, "PARAMETERS", null, 0, 0);
+        DetailAST child6 = mockAST(TokenTypes.RPAREN, ")", null, 0, 0);
+        DetailAST child7 = mockAST(TokenTypes.SLIST, "{", null, 0, 0);
+        DetailAST grandchild = mockAST(TokenTypes.VARIABLE_DEF, "VARIABLE_DEF", null, 0, 0);
+        DetailAST ggchild1 = mockAST(TokenTypes.MODIFIERS, "MODIFIERS", null, 0, 0);
+        DetailAST ggchild2 = mockAST(TokenTypes.TYPE, "TYPE", null, 0, 0);
+        DetailAST gggchild1 = mockAST(TokenTypes.IDENT, "String", null, 0, 0);
+        DetailAST ggchild3 = mockAST(TokenTypes.IDENT, "newString1", null, 0, 0);
+        DetailAST ggchild4 = mockAST(TokenTypes.ASSIGN, "=", null, 0, 0);
+        DetailAST gggchild2 = mockAST(TokenTypes.EXPR, "EXPR", null, 0, 0);
+        DetailAST ggggchild1 = mockAST(TokenTypes.METHOD_CALL, "(", null, 0, 0);
+        DetailAST gggggchild1 = mockAST(TokenTypes.DOT, ".", null, 0, 0);
+        DetailAST ggggggchild1 = mockAST(TokenTypes.LITERAL_THIS, "this", null, 0, 0);
+        DetailAST ggggggchild2 = mockAST(TokenTypes.IDENT, "method1", null, 0, 0);
+        DetailAST gggggchild2 = mockAST(TokenTypes.ELIST, "ELIST", null, 0, 0);
+        DetailAST gggggchild3 = mockAST(TokenTypes.RPAREN, ")", null, 0, 0);
+        DetailAST ggchild5 = mockAST(TokenTypes.SEMI, ";", null, 0, 0);
         
-        ReflectionTestUtils.setField(fe, "switches", 1);
-        ReflectionTestUtils.invokeMethod(tc,"checkForSwitchStatements", ast);   
-        PowerMock.mockStaticPartial(FeatureEnvyCheck.class, "countInstances");
-        EasyMock.expect(FeatureEnvyCheck.countInstances(mockAST, 3)).andReturn();
-        PowerMock.replayAll();
-        assertFalse(Date.validCombination(29,02,2017));
-        assertTrue(Date.validCombination(31,01,2017));
-        assertFalse(Date.validCombination(31,06,2017));
-        //replace later
-        // for integration testing
+        parent.addChild(child1);
+        parent.addChild(child2);
+        parent.addChild(child3);
+        parent.addChild(child4);
+        parent.addChild(child5);
+        parent.addChild(child6);
+        parent.addChild(child7);
+        child7.addChild(grandchild);
+        grandchild.addChild(ggchild1);
+        grandchild.addChild(ggchild2);
+        ggchild2.addChild(gggchild1);
+        grandchild.addChild(ggchild3);
+        grandchild.addChild(ggchild4);
+        ggchild4.addChild(gggchild2);
+        gggchild2.addChild(ggggchild1);
+        ggggchild1.addChild(gggggchild1);
+        gggggchild1.addChild(ggggggchild1);
+        gggggchild1.addChild(ggggggchild2);
+        ggggchild1.addChild(gggggchild2);
+        ggggchild1.addChild(gggggchild3);
+        ggchild4.addChild(ggchild5);
+
+        Dictionary<String, Integer> classFeaturesLocal = new Hashtable<>();
+        int count = 3;
+
+        // Need to mock a call to countInstances
+        Mockito.doReturn(false).when(spyTester).countInstances(classFeaturesLocal, child1);
+        
+        spyTester.checkSiblings(child1, count);
+        assertFalse(spyTester.FV_Found);
     }
     
+    /*
+     * Tests checkSiblings function when findClassCalls is called inside the loop
+     */
     @Test
-    public void testCountInstances() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void testCheckSiblings2() {
+        //As described in deliverable, this set of nodes acts as a mock-up
+        // of a part of an actual parse tree from the treewalker GUI
+        DetailAST parent = mockAST(TokenTypes.METHOD_DEF, "parent", null, 0, 0);
+        DetailAST child1 = mockAST(TokenTypes.MODIFIERS, "MODIFIERS", null, 0, 0);
+        DetailAST child2 = mockAST(TokenTypes.TYPE, "TYPE", null, 0, 0);
+        DetailAST child3 = mockAST(TokenTypes.IDENT, "FE_This", null, 0, 0);
+        DetailAST child4 = mockAST(TokenTypes.LPAREN, "(", null, 0, 0);
+        DetailAST child5 = mockAST(TokenTypes.PARAMETERS, "PARAMETERS", null, 0, 0);
+        DetailAST child6 = mockAST(TokenTypes.RPAREN, ")", null, 0, 0);
+        DetailAST child7 = mockAST(TokenTypes.SLIST, "{", null, 0, 0);
+        DetailAST grandchild = mockAST(TokenTypes.VARIABLE_DEF, "VARIABLE_DEF", null, 0, 0);
+        DetailAST ggchild1 = mockAST(TokenTypes.MODIFIERS, "MODIFIERS", null, 0, 0);
+        DetailAST ggchild2 = mockAST(TokenTypes.TYPE, "TYPE", null, 0, 0);
+        DetailAST gggchild1 = mockAST(TokenTypes.IDENT, "String", null, 0, 0);
+        DetailAST ggchild3 = mockAST(TokenTypes.IDENT, "newString1", null, 0, 0);
+        DetailAST ggchild4 = mockAST(TokenTypes.ASSIGN, "=", null, 0, 0);
+        DetailAST gggchild2 = mockAST(TokenTypes.EXPR, "EXPR", null, 0, 0);
+        DetailAST ggggchild1 = mockAST(TokenTypes.METHOD_CALL, "(", null, 0, 0);
+        DetailAST gggggchild1 = mockAST(TokenTypes.DOT, ".", null, 0, 0);
+        DetailAST ggggggchild1 = mockAST(TokenTypes.LITERAL_THIS, "this", null, 0, 0);
+        DetailAST ggggggchild2 = mockAST(TokenTypes.IDENT, "method1", null, 0, 0);
+        DetailAST gggggchild2 = mockAST(TokenTypes.ELIST, "ELIST", null, 0, 0);
+        DetailAST gggggchild3 = mockAST(TokenTypes.RPAREN, ")", null, 0, 0);
+        DetailAST ggchild5 = mockAST(TokenTypes.SEMI, ";", null, 0, 0);
+        
+        parent.addChild(child1);
+        parent.addChild(child2);
+        parent.addChild(child3);
+        parent.addChild(child4);
+        parent.addChild(child5);
+        parent.addChild(child6);
+        parent.addChild(child7);
+        child7.addChild(grandchild);
+        grandchild.addChild(ggchild1);
+        grandchild.addChild(ggchild2);
+        ggchild2.addChild(gggchild1);
+        grandchild.addChild(ggchild3);
+        grandchild.addChild(ggchild4);
+        ggchild4.addChild(gggchild2);
+        gggchild2.addChild(ggggchild1);
+        ggggchild1.addChild(gggggchild1);
+        gggggchild1.addChild(ggggggchild1);
+        gggggchild1.addChild(ggggggchild2);
+        ggggchild1.addChild(gggggchild2);
+        ggggchild1.addChild(gggggchild3);
+        ggchild4.addChild(ggchild5);
+
+
+        Dictionary<String, Integer> classFeaturesLocal = new Hashtable<>();
+        int count = 3;
+
+        // Need to mock a call to countInstances
+        Mockito.doReturn(classFeaturesLocal).when(spyTester).findClassCalls(child2, classFeaturesLocal);
+        
+        spyTester.checkSiblings(child1, count);
+        assertFalse(spyTester.FV_Found);
+    }
+    
+    /*
+     * Tests the case where instanceDict.get("this") == null by passing in a 
+     * completely empty dictionary
+     */
+    @Test
+    public void testCountInstancesNull() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         DetailAST childAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
         //let's create an empty dictionary
         Dictionary<String, Integer> tempDict = new Hashtable<>();
-        // We need to add to the dict at least one "this"
-        tempDict.put("this", 1);
-        // also let's add two references to bicycle
-        tempDict.put("bicycle", 2);
-        
-        // we need to mock up getLineNumber
-        //doReturn(100).when(childAST).getLineNo();
-        // and probably mock up log()
-        //doReturn("feature envy found").when(spyTester).log(100, "feature envy found");
-        
-        // and see if we get to the log, so call fxn
-        Method countInstancesMethod
-        = FeatureEnvyCheck.class.getDeclaredMethod("countInstances", Hashtable.class, DetailAST.class);
-   
-        FeatureEnvyCheck operationsInstance = new FeatureEnvyCheck();
-        Double result = (Double) countInstancesMethod.invoke(operationsInstance, tempDict, childAST);
-    
-        // now add two more ref to this
-        tempDict.put("this", 2);
-        // and call fxn again
+        assertFalse(spyTester.countInstances(tempDict, childAST));
     }
     
+    /*
+     * Tests where the following line evaluates to false:
+     * (k != "none" && instanceDict.get(k) > thisClassCount)
+     */
     @Test
-    public void testCheckSLIST() {
+    public void testCountInstancesFalse() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        DetailAST childAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        //let's create an empty dictionary
+        Dictionary<String, Integer> tempDict = new Hashtable<>();
+        // We need to add to the dict at least one "none"
+        tempDict.put("none", 1);
+        // We need to add to the dict at least one "this"
+        tempDict.put("this", 2);
+        // also let's add two references to bicycle
+        tempDict.put("bicycle", 1);
+        // should get false
+        assertFalse(spyTester.countInstances(tempDict, childAST));
+    }
+    
+    /*
+     * Tests where the following line evaluates to true:
+     * (k != "none" && instanceDict.get(k) > thisClassCount)
+     */
+    @Test
+    public void testCountInstancesTrue() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        DetailAST childAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        //let's create an empty dictionary
+        Dictionary<String, Integer> tempDict = new Hashtable<>();
+        // We need to add to the dict at least one "none"
+        tempDict.put("none", 1);
+        // We need to add to the dict at least one "this"
+        tempDict.put("this", 2);
+        // also let's add two references to bicycle
+        tempDict.put("bicycle", 3);
+        // should get true
+        assertTrue(spyTester.countInstances(tempDict, childAST));
+    }
+    
+    /*
+     * Tests when a Method Call has no children
+     */
+    @Test
+    public void testCheckSLIST_none0() {
+        DetailAST exprAST = mockAST(TokenTypes.METHOD_CALL, "testEXPR", "testString2", 0, 0);
+        // now we need to reach the "none" line
+        assertEquals("none", spyTester.checkSLIST(exprAST));
+    }
+    
+    /*
+     * Tests when EXPR is not followed by a method call
+     */
+    @Test
+    public void testCheckSLIST_none1() {
         DetailAST exprAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
-        DetailAST methodAST = mockAST(TokenTypes.METHOD_CALL, null, null, 0, 0);
-        DetailAST identAST = mockAST(TokenTypes.IDENT, "bicycle", null, 0, 0);
-        DetailAST dotAST = mockAST(TokenTypes.DOT, null, null, 0, 0);
-        
-        FeatureEnvyCheck fe = new FeatureEnvyCheck();
+        DetailAST methodAST = mockAST(TokenTypes.LITERAL_INSTANCEOF, "instanceof", null, 0, 0);
+
         exprAST.addChild(methodAST);
-        System.out.println(exprAST.getType());
-        System.out.println(methodAST.getType());
-        System.out.println(exprAST.getFirstChild());
-        assertEquals(TokenTypes.METHOD_CALL,methodAST.getType());
-        
-        methodAST.addChild(identAST);
-        assertEquals(TokenTypes.IDENT,methodAST.getFirstChild().getType());
-        
-        assertEquals("this", spyTester.checkSLIST(exprAST));
-        
-        methodAST.setFirstChild(dotAST);
-        assertEquals(TokenTypes.DOT,methodAST.getFirstChild().getType());
-        
-        dotAST.addChild(identAST);
-        assertEquals(TokenTypes.IDENT, dotAST.getFirstChild().getType());
-        assertEquals("bicycle", identAST.getText());
-        
-        assertEquals("bicycle", spyTester.checkSLIST(exprAST));
         
         // now we need to reach the "none" line
-        assertEquals("none", spyTester.checkSLIST(dotAST));
+        assertEquals("none", spyTester.checkSLIST(exprAST));
     }
     
-    @Test 
-    public void testFindClassCalls() {
-        DetailAST siblingAST = mockAST(TokenTypes.SLIST, "sibling", null, 0, 0);
-        DetailAST siblingChildAST = mockAST(TokenTypes.EXPR, "firstChild", null, 0, 0);
-        DetailAST siblingChild2AST = mockAST(TokenTypes.EXPR, "childSibling", null, 0, 0);
-        Dictionary<String, Integer> classFeatures = new Hashtable<>();
+    /*
+     * Tests when a method call is not followed by an IDENT or DOT token
+     */
+    @Test
+    public void testCheckSLIST_none2() {
+        DetailAST exprAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        DetailAST methodAST = mockAST(TokenTypes.METHOD_CALL, null, null, 0, 0);
+        DetailAST identAST = mockAST(TokenTypes.ASSIGN, "=", null, 0, 0);
+
+        exprAST.addChild(methodAST);
+        methodAST.addChild(identAST);
         
-        // need to mock up checking input AST for null
-        assertFalse(siblingAST == null);
-        // need to mock up checking that type = SLIST
-        assertEquals(TokenTypes.SLIST, siblingAST.getType());       
-        // need to add a child
-        siblingAST.addChild(siblingChildAST);
-        // need to mock up checking first child for null
-        assertFalse(siblingChildAST == null);
-        // need to mock up getting first child
-        assertEquals(TokenTypes.EXPR,siblingAST.getFirstChild().getType());
-        // Before Adding anythng to our node values...
+        // now we need to reach the "none" line
+        assertEquals("none", spyTester.checkSLIST(exprAST));
+    }
+    
+    /*
+     * Tests when a DOT token is not followed by an IDENT token
+     */
+    @Test
+    public void testCheckSLIST_none3() {
+        DetailAST exprAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        DetailAST methodAST = mockAST(TokenTypes.METHOD_CALL, null, null, 0, 0);
+        DetailAST dotAST = mockAST(TokenTypes.DOT, "6.", null, 0, 0);
+        DetailAST identAST = mockAST(TokenTypes.ASSIGN, "=", null, 0, 0);
+
+        exprAST.addChild(methodAST);
+        methodAST.addChild(dotAST);
+        dotAST.addChild(identAST);
+        
+        // now we need to reach the "none" line
+        assertEquals("none", spyTester.checkSLIST(exprAST));
+    }
+    
+    /*
+     * Tests path through checkSLIST that returns string "this"
+     */
+    @Test
+    public void testCheckSLIST_this() {
+        DetailAST exprAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        DetailAST methodAST = mockAST(TokenTypes.METHOD_CALL, null, null, 0, 0);
+        DetailAST identAST = mockAST(TokenTypes.IDENT, "this", null, 0, 0);
+        
+        exprAST.addChild(methodAST);
+        methodAST.addChild(identAST);
+        
+        assertEquals("this", spyTester.checkSLIST(exprAST));
+    }
+    
+    /*
+     * Tests path through checkSLIST that returns a name of another class
+     */
+    @Test
+    public void testCheckSLIST_other() {
+        DetailAST exprAST = mockAST(TokenTypes.EXPR, "testEXPR", "testString2", 0, 0);
+        DetailAST methodAST = mockAST(TokenTypes.METHOD_CALL, null, null, 0, 0);
+        DetailAST dotAST = mockAST(TokenTypes.DOT, null, null, 0, 0);
+        DetailAST identAST = mockAST(TokenTypes.IDENT, "bicycle", null, 0, 0);
+        
+        exprAST.addChild(methodAST);
+        methodAST.addChild(dotAST);
+        dotAST.addChild(identAST);
+
+        assertEquals("bicycle", spyTester.checkSLIST(exprAST));
+    }
+    
+    /*
+     * Tests that findClassCalls adds to the dictionary when the right tokens are seen
+     */
+    @Test 
+    public void testFindClassCalls1() {
+        DetailAST parent = mockAST(TokenTypes.METHOD_DEF, "METHOD_DEF", null, 0, 0);
+        DetailAST siblingAST = mockAST(TokenTypes.EXPR, "firstChild", null, 0, 0);
+        DetailAST siblingSiblingAST = mockAST(TokenTypes.SLIST, "secondChild", null, 0, 0);
+        DetailAST siblingChildAST = mockAST(TokenTypes.VARIABLE_DEF, "VARIABLE_DEF", null, 0, 0);
+        DetailAST siblingChild3AST = null;
+        
+        // set up tree
+        parent.addChild(siblingAST);
+        parent.addChild(siblingSiblingAST);
+        siblingSiblingAST.addChild(siblingChildAST);
+        siblingSiblingAST.addChild(siblingChild3AST);
+        
+        //let's create an empty dictionary
+        Dictionary<String, Integer> emptyDict = new Hashtable<>();
+        emptyDict.put("this", 1);
+        
+        //let's create a dictionary with "none": 0, "this":1
+        Dictionary<String, Integer> thisDict = new Hashtable<>();
+        thisDict.put("this", 2);
+        
+        Mockito.doReturn("this").when(spyTester).checkSLIST(siblingChildAST);
+        //let's call findclasscalls and assert expected results
+        assertEquals(thisDict, spyTester.findClassCalls(siblingAST, emptyDict));
+    }
+    
+    /*
+     * Tests that the loop only goes through once
+     */
+    @Test 
+    public void testFindClassCalls2() {
+        DetailAST parent = mockAST(TokenTypes.METHOD_DEF, "METHOD_DEF", null, 0, 0);
+        DetailAST siblingAST = mockAST(TokenTypes.EXPR, "firstChild", null, 0, 0);
+        DetailAST siblingSiblingAST = mockAST(TokenTypes.SLIST, "secondChild", null, 0, 0);
+        DetailAST siblingChildAST = mockAST(TokenTypes.VARIABLE_DEF, "VARIABLE_DEF", null, 0, 0);
+        DetailAST siblingChild3AST = null;
+        
+        // set up tree
+        parent.addChild(siblingAST);
+        parent.addChild(siblingSiblingAST);
+        siblingSiblingAST.addChild(siblingChildAST);
+        siblingSiblingAST.addChild(siblingChild3AST);
+        
         //let's create an empty dictionary
         Dictionary<String, Integer> emptyDict = new Hashtable<>();
         
         //let's create a dictionary with "none": 0, "this":1
         Dictionary<String, Integer> thisDict = new Hashtable<>();
-        thisDict.put("this", 1);
-        // need to mock up adding to dictionary
-        doReturn("this").when(spyTester).checkSLIST(siblingChildAST);
+        thisDict.put("this", 2);
+        
+        Mockito.doReturn("this").when(spyTester).checkSLIST(siblingChildAST);
         //let's call findclasscalls and assert expected results
-        assertEquals(thisDict, spyTester.findClassCalls(siblingAST, emptyDict));
-        
-        //let's create a dictionary with "none":1, "this":0
-        Dictionary<String, Integer> noneDict = new Hashtable<>();
-        // need to mock up testing if a string is in the dictionary
-        assertFalse(((Hashtable<String, Integer>) noneDict).containsKey("none"));
-        //now add
-        noneDict.put("none", 1);
-        // and test again
-        assertTrue(((Hashtable<String, Integer>) noneDict).containsKey("none"));
-        // need to mock up adding to dictionary
-        doReturn("none").when(spyTester).checkSLIST(siblingChildAST);
-        //now try calling the function and see if we get noneDict
-        //let's create an empty dictionary
-        Dictionary<String, Integer> emptyDict2 = new Hashtable<>();
-        assertEquals(noneDict, spyTester.findClassCalls(siblingAST, emptyDict2));
-        // need to add a sibling
-        siblingChildAST.addNextSibling(siblingChild2AST);
-        // need to mock up getting next sibling
-        assertEquals(TokenTypes.EXPR,siblingChildAST.getNextSibling().getType());
-        
+        assertNotEquals(thisDict, spyTester.findClassCalls(siblingAST, emptyDict));
+    }
+    
+
+
+    /**
+     * This section contains basic unit tests for the getters and setters in the
+     * AbstractCheck Class
+     */
+    
+    /*
+     * Tests the default token are set up as expected and the returned result 
+     * matches what we think the default tokens are
+     */
+    @Test
+    public void testGetDefaultTokens() {
+        assertArrayEquals(defaultTokens, spyTester.getDefaultTokens());
+        verify(spyTester, times(1)).getDefaultTokens();
+    }
+
+    /*
+     * Tests that when compared to a random array of tokens, the getDefaultTokens
+     * function produces an array of tokens which doesn't match
+     */
+    @Test
+    public void testGetNotDefaultTokens() {
+        assertNotEquals(unacceptableTokens, spyTester.getDefaultTokens());
+        verify(spyTester, times(1)).getDefaultTokens();
+    }
+
+    /*
+     * Tests that the required tokens match what we expect and that the function
+     * is called
+     */
+    @Test
+    public void testGetRequiredTokens() {
+        assertArrayEquals(requiredTokens, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
+    }
+
+    /*
+     * Tests that when compared to a random array of tokens, the 
+     * getReuiredTokens function produces an array of tokens which 
+     * doesn't match
+     */
+    @Test
+    public void testGetUnrequiredTokens() {
+        assertNotEquals(unacceptableTokens, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
+    }
+
+    /*
+     * Tests that getRequiredTokens does not return null
+     */
+    @Test
+    public void testGetNullRequiredTokens() {
+        assertNotEquals(null, spyTester.getRequiredTokens());
+        verify(spyTester, times(1)).getRequiredTokens();
+    }
+    
+    /*
+     * Tests that the array of acceptable tokens matches what we expect
+     */
+    @Test
+    public void testGetAcceptableTokens() {
+        assertArrayEquals(acceptableTokens, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
+    }
+
+    /*
+     * Tests that when compared to a random array of tokens, the 
+     * accweptable tokens does not match
+     */
+    @Test
+    public void testGetUnacceptableTokens() {
+        assertNotEquals(unacceptableTokens, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
+    }
+
+    /*
+     * Tests that getAcceptableTokens does not return null
+     */
+    @Test
+    public void testGetNullAcceptableTokens() {
+        assertNotEquals(null, spyTester.getAcceptableTokens());
+        verify(spyTester, times(1)).getAcceptableTokens();
     }
 
 /////////// mocking method from test
