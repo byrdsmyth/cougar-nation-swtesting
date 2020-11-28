@@ -1,10 +1,10 @@
-package net.sf.eclipsecs.sample.checks;
+package src.net.sf.eclipsecs.sample.checks;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-/*
+/**
  * The Blob, also named God Class, is a class implementing different responsibilities,
  * generally characterized by the presence of a high number of attributes and methods, which
  * implement different functionalities, and by many dependencies with data classes (i.e., classes
