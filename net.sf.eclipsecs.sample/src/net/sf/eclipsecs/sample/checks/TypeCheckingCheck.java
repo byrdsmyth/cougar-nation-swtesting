@@ -146,7 +146,6 @@ public class TypeCheckingCheck extends AbstractCheck{
 	   */
 	  private final void checkForLongLogic(final DetailAST ast) {
 		  if(ast.getType() == TokenTypes.LITERAL_IF) {
-			  System.out.println(values);
 			  if(!ast.toStringTree().contains("null")) {
 				  values = ast.toStringTree();
 			  }
