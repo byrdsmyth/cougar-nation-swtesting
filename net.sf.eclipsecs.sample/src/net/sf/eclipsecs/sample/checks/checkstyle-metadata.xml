@@ -83,25 +83,25 @@
             are ready to work on them / if we work on them
         -->
         
-        <!--
-        <rule-metadata name="%DivergentChange.name" internal-name="DivergentChange" parent="TreeWalker">
-            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.DivergentChangeCheck" />
-            <description>%DivergentChange.desc</description>
+        
+        <rule-metadata name="%TypeCheckingD3.name" internal-name="TypeCheckD3" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.TypeCheckD3" />
+            <description>%TypeCheckingD3.desc</description>
             <property-metadata name="max" datatype="Integer" default-value="100">
                 <description>The maximum number of allowed methods.</description>
             </property-metadata>
         </rule-metadata>
-        -->
         
-        <!--
-        <rule-metadata name="%FunctionalDecomposition.name" internal-name="FunctionalDecomposition" parent="TreeWalker">
-            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.FunctionalDecompositionCheck" />
+        
+        
+        <rule-metadata name="%SwissArmyD3.name" internal-name="SwissArmyD3" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SwissArmyD3" />
             <description>%FunctionalDecomposition.desc</description>
             <property-metadata name="max" datatype="Integer" default-value="100">
                 <description>The maximum number of allowed methods.</description>
             </property-metadata>
         </rule-metadata>
-        -->
+        
         
         <!--
         <rule-metadata name="%ParallelInheritance.name" internal-name="ParallelInheritance" parent="TreeWalker">
