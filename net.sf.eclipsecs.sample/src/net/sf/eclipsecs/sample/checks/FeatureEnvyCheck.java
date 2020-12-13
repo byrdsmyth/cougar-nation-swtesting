@@ -4,16 +4,30 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-
 /**
- *  Check potential feature envy
- *  in a class 
- * 
- *  @author yang
- *
- */
+*  Check potential feature envy
+*  in a class 
+* 
+*  @author yang
+*
+*/
 
 public class FeatureEnvyCheck extends AbstractCheck {
+
+    @Override
+    public int[] getDefaultTokens() {
+        return new int[] {TokenTypes.CLASS_DEF};
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return getDefaultTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return getDefaultTokens();
+    }
     
     /**
      * FeatureEnvy happens when the function of object 1
@@ -25,54 +39,104 @@ public class FeatureEnvyCheck extends AbstractCheck {
     public void visitToken(DetailAST ast) {
         if(ast != null) {
             final DetailAST ast1 = ast.findFirstToken(TokenTypes.OBJBLOCK);
-            final DetailAST ast2 = ast1.findFirstToken(TokenTypes.VARIABLE_DEF);
-            DetailAST codeBlock = ast2;
-            while(codeBlock.getType() == TokenTypes.VARIABLE_DEF) {
-                DetailAST modifierName = codeBlock.getFirstChild().getFirstChild();
-                //System.out.println(modifierName.getText());
-                if(modifierName == null || !modifierName.getText().equals("private")) {
-                    detected();
-                    ast.getLineNo();
-                    //log(ast.getLineNo(), "FeatureEnvyCheck", 0);
+            if(ast1 != null) {
+                final DetailAST ast2 = ast1.findFirstToken(TokenTypes.VARIABLE_DEF);
+                DetailAST codeBlock = ast2;
+                if (codeBlock != null) {
+                    while(codeBlock.getType() == TokenTypes.VARIABLE_DEF) {
+                        DetailAST modifierName = codeBlock.getFirstChild().getFirstChild();
+                        //System.out.println(modifierName.getText());
+                        if(modifierName == null || !modifierName.getText().equals("private")) {
+                            detected();
+                            ast.getLineNo();
+        //                    log(ast.getLineNo(), "FeatureEnvyCheck", 0);
+                        }
+                        codeBlock = codeBlock.getNextSibling();
+                    }
                 }
-                    
-                
-                codeBlock = codeBlock.getNextSibling();
             }
         }
     }
     
-    public void detected() {
-        
-    }
-    @Override
-    public int[] getAcceptableTokens() {
-        // TODO Auto-generated method stub
-        return getDefaultTokens();
-    }
-
-    @Override
-    public int[] getDefaultTokens() {
-        // TODO Auto-generated method stub
-        return new int[] { TokenTypes.CLASS_DEF};
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        // TODO Auto-generated method stub
-        return getDefaultTokens();
-    }
-
+    public void detected() { }
+    
+    
 }
 
 
-
-
-
-
-
-//package net.sf.eclipsecs.sample.checks;
+////import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+////import com.puppycrawl.tools.checkstyle.api.DetailAST;
+////import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+////
+////
+/////**
+//// *  Check potential feature envy
+//// *  in a class 
+//// * 
+//// *  @author yang
+//// *
+//// */
+////
+////public class FeatureEnvyCheck extends AbstractCheck {
+////    
+////    /**
+////     * FeatureEnvy happens when the function of object 1
+////     * relays on some fields of object 2. Therefore, all fields
+////     * need to be private to prevent potential feature envy
+////     * 
+////     */
+////    @Override
+////    public void visitToken(DetailAST ast) {
+////        if(ast != null) {
+////            final DetailAST ast1 = ast.findFirstToken(TokenTypes.OBJBLOCK);
+////            final DetailAST ast2 = ast1.findFirstToken(TokenTypes.VARIABLE_DEF);
+////            DetailAST codeBlock = ast2;
+////            while(codeBlock.getType() == TokenTypes.VARIABLE_DEF) {
+////                DetailAST modifierName = codeBlock.getFirstChild().getFirstChild();
+////                //System.out.println(modifierName.getText());
+////                if(modifierName == null || !modifierName.getText().equals("private")) {
+////                    detected();
+////                    ast.getLineNo();
+////                    //log(ast.getLineNo(), "FeatureEnvyCheck", 0);
+////                }
+////                    
+////                
+////                codeBlock = codeBlock.getNextSibling();
+////            }
+////        }
+////    }
+////    
+////    public void detected() {
+////        
+////    }
+////    @Override
+////    public int[] getAcceptableTokens() {
+////        // TODO Auto-generated method stub
+////        return getDefaultTokens();
+////    }
+////
+////    @Override
+////    public int[] getDefaultTokens() {
+////        // TODO Auto-generated method stub
+////        return new int[] { TokenTypes.CLASS_DEF};
+////    }
+////
+////    @Override
+////    public int[] getRequiredTokens() {
+////        // TODO Auto-generated method stub
+////        return getDefaultTokens();
+////    }
+////
+////}
 //
+//
+//
+//
+//
+//
+//
+////package net.sf.eclipsecs.sample.checks;
+////
 //import java.util.Dictionary;
 //import java.util.Enumeration;
 //import java.util.Hashtable;

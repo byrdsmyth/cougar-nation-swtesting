@@ -60,5 +60,11 @@
             <alternative-name internal-name="net.sf.eclipsecs.sample.checks.SpaghettiCodeCheck" />
             <description>%SpaghettiCode.desc</description>
         </rule-metadata>
+        <rule-metadata name="%FunctionalDecomposition.name" internal-name="FunctionalDecomposition" parent="TreeWalker">
+            <alternative-name internal-name="net.sf.eclipsecs.sample.checks.FunctionalDecompositionCheck" />
+            <description>%FunctionalDecomposition.desc</description>
+            <property-metadata name="max" datatype="Integer" default-value="3">
+            </property-metadata>
+        </rule-metadata>
     </rule-group-metadata>
 </checkstyle-metadata>
